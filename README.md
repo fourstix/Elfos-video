@@ -90,70 +90,103 @@ Repository Contents
   * romtext.c - Tool generate ROM help information from a text file, such as help.new 
   * romtext.exe - Executable file for Windows 10.
 * **/pis/** -- Pictures for the repository documentation 
+
 Elf/OS Video Commands
 ---------------------
 **vstart** - Start Video
 * Allocate the video buffers in high memory, if needed, and set the video flag to true.  The display can be updated
 until a *vstop* command is issued.
+  
 **vstop** - Stop Video
 * Option: -u
 * Set the video flag to false. The display will not be updated until *vstart* command is issued. 
 * The command *vstop -u* will stop the video and unload the video buffers returning the high memory to the system, if possible.
+
 **vtest** - Test the Video and show status
 * Test the video and print out whether the video buffers are allocated, whether video is on and the location of the video buffers in high memory.
+
 **cls** - Clear the screen
 * Clear the screen
+
 **draw *filename***
 * Read a 256-byte or 512-byte image from the file *filename* and draw it the display.
+
 **capture *filename***
 * Write the image in the video buffer to a 512-byte file named *filename* on the disk.
+
 **echo**
-* Turn echo on and off.  When echo is on, text written using the O_MSG, O_TYPE and O_INMSG bios routines will be written to the display and to the serial output.  If echo is already on, *echo* will turn the echo function off.  The echo command is only available when the video routines are in ROM, since they must be available after the command is run.
+* Turn echo on and off.  When echo is on, text written using the O_MSG, O_TYPE and O_INMSG bios routines will be written to the display and to the serial output.  
+* If echo is already on, *echo* will turn the echo function off.  
+* The echo command is only available when the video routines are in ROM, since they must be available to the Elf/OS after the *echo* command has run.
+
 **write *text***
 * Write the string *text* to the display.
+
 **CharSet**
 * Demo program to print charater set to the display.
+
 **HelloWorld**
 * Demo program to print the greeting "Hello, World!" to the display.
+
 **SpriteDemo**
 * Demo program to draw sprite graphics to the display.
+
 **StringTest**
 * Demo program to print various strings to the display.
+
 Video Routines
 --------------
 **ValidateVideo** - Validate video buffers are loaded into high memory
 * Returns RF.0 equal Zero if valid, non-zero if not valid
+
 **AllocateVideoBuffers** -- Allocate video buffers in high memory. 
+
 **VideoOn** -- Turn video on
+
 **VideoOff** -- Turn video off
+
 **UnloadVideo** -- Unload video buffers and return high memory to system.
+
 **IsVideoReady** -- Test if video buffers are loaded and video is on.
 * Returns RF.0 non-zero (true) if ready, zero if not ready
+
 **UpdateVideo** -- Update the video display. Briefly turns on Interrupts and DMA to update display.
+
 **ClearScreen** -- Clear the screen, reset the text cursor to home.
+
 **PutChar** -- Write a character to the display at the cursor position.
 * RC.0 contains the ASCII code of the character to write.
+
 **Println** -- Write a string to the display at the cursor position followed by a new line character.
 * RF contains an pointer to the address of the character buffer with the null-terminated string.
+
 **Print** -- Write a string to the display at the cursor position.
 * RF contains an pointer to the address of the character buffer with the null-terminated string.
+
 **GetEchoFlag** -- Get the status of the Echo function
 * Returns RF.0 with the value of Echo flag. Zero means echo is off; non-zero means echo is on.
+
 **EchoOn** -- Turn echo on. Text written by O_TYPE, O_MSG and O_INMSG will be printed to the display and to the serial output.
+
 **EchoOff** -- Turn echo off. Text written by O_TYPE, O_MSG and O_INMSG will no longer be copied to the display.
+
 **DrawString** -- Write a text string to an explicit X,Y location on the display.
 * RA.0 contains the X coordinate of the string
 * RA.1 contains the Y coordinate of the string
 * RF contains the address pointer to a character buffer with the null-terminated string.
+
 **Draw32x64Image** -- Draw an 32x64 bit image to the display.
 * RF contains the address pointer to 256 byte buffer with the image data
+
 **Draw64x64Image** -- Draw an 32x64 bit image to the display.
 * RF contains the address pointer to 512 byte buffer with the image data
+
 **DrawSprite** -- Draw a graphical sprite to the display
 * RA.0 contains the X coordinate of the sprite
 * RA.1 contains the Y coordinate of the sprite
 * RD contains the size of the sprite in bytes
 * RF contains the address pointer to a buffer with the sprite image data.
+
 Examples
 --------
 **TBD** -- table with example pictures goes here.
