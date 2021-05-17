@@ -19,7 +19,7 @@ Repository Contents
   * VideoRom.asm	- Assembly file to locate the Elf/OS video functions in ROM.
   * bios.inc - Include file for Elf/OS bios definitions from [rileym65/Elf-BIOS](https://github.com/rileym65/Elf-BIOS)
   * kernel.inc - Include file for Elf/OS kernel definitions from [rileym65/Elf-Elfos-Kernel](https://github.com/rileym65/Elf-Elfos-Kernel)
-  *
+  These files are used to create the video.hex file used for the ROM images.
 * **/src/**  -- Video programs for the Elf/OS
   * video.inc - Include file for video ROM definitions.
   * vstart.asm - Start video by allocating video buffers in high memory and set flags.
@@ -49,3 +49,43 @@ Repository Contents
   * bios.inc - Include file for Elf/OS bios definitions from [rileym65/Elf-BIOS](https://github.com/rileym65/Elf-BIOS)
   * kernel.inc - Include file for Elf/OS kernel definitions from [rileym65/Elf-Elfos-Kernel](https://github.com/rileym65/Elf-Elfos-Kernel)
   * StdDefs.asm - standard definitions and macros used in assembly source files
+  These files can be compiled to run with the video routines in ROM or in the command memory, except
+  for echo which works only with the video routines in ROM.  Setting the VideoCode constant to "ROM"
+  in the code will use the addresses in video.inc to locate the routines, setting the VideoCode constant
+  to MEM will locate the routines in the Elf/OS user memory.  The echo command relies on the routines
+  remaining available while the Elf/OS is running, so it requires the routines to be located in ROM.  
+* **/bin/video/**  -- Assembled binary code from the source files.
+  * video.hex - Hex file assembled for video source.
+  * **/bin/video/mem/**
+  Binary files assembled from the source with the video routines located in memory.  These files can be loaded
+  into the Elf/OS file system using the xr or xrb command.
+  * **/bin/video/rom/**
+  Binary files assembled from the source with the video routines located in ROM.  These files can be loaded
+  into the Elf/OS file system using the xr or xrb command.
+* **/bin/pev2_rom/**  -- Pico/Elf v2 Runtime ROM with video routines.  
+  * runtime+video.hex - Hex file for Pico/Elf v2 Runtime with assembled video routines added at address A000H.
+* **/bin/stg_rom/**  -- Spare Time Gizmos v1.07 ROM with video routines.  
+  * StgVideo.hex - Hex file for Spare Time Gizmos v1.07 with RCForth removed, and assembled video routines added at address A000H.
+* **/utils/pev2_rom/**  -- Utility files to create Pico/Elf v2 Runtime ROM with video routines. 
+  * runtime.hex - [Hex file for Pico/Elf v2 Runtime](http://www.elf-emulation.com/software/picoelf/runtime.hex) from [Elf-Emulation](http://www.elf-emulation.com/software.html) website.
+ **/utils/stg_rom/**  -- Utility files to create Spare Time Gizmos v1.07 ROM with video routines.  
+  * help.new - Updated help text with references to RC Forth removed. RC Forth is replaced by the video routines at address A000H.
+  * Make_Stg.bat - Batch files to run the STG ROM tools to create the STG v1.07 ROM with video routines.
+  * readme.txt - Updated detailed information on how the ROM is created with video routines in place of the RC Forth code.
+  * readme_original.txt - Original detailed information on how the STG v1.07 ROM is created.
+**/utils/stg_rom/**  -- Original program hex files used to create the STG v1.07 rom
+  * bios.hex - Bios routines assembled from [rileym65/Elf-BIOS](https://github.com/rileym65/Elf-BIOS)  
+  * boots.hex - Bootstrap monitor program for the Pico/Elf v2 from [Spare Time Gizmos](http://www.sparetimegizmos.com/Hardware/Elf2K.htm).
+  * edtasm.hex - Edit/Asm program assembled from [rileym65/Elf-EDTASM](https://github.com/rileym65/Elf-EDTASM)
+  * rcbasic.hex - Rcbasic program assembled from [rileym65/Elf-RcBasic](https://github.com/rileym65/Elf-RcBasic)
+  * sedit.hex - Sedit program assembled from [rileym65/Elf-Elfos-sedit](https://github.com/rileym65/Elf-Elfos-sedit)
+  * visual02.hex - Visual02 program assembled from [rileym65/Elf-Visual02](https://github.com/rileym65/Elf-Visual02)
+  * xmodem.hex - XModem communication routines similar to those used in [rileym65/Elf-diskless](https://github.com/rileym65/Elf-diskless)
+**/utils/stg_rom/tools_win10** -- Sparte Time Gizmos Rom tools compiled for Windows 10 using the Microsoft Visual Studio for C Community Edition C compiler. Except for a few edits to update obsolete references, the source files are largely unchanged. 
+  * readme_tools.txt - Original information file from Spare Time Gizmos
+  * romcksum.c - Tool to generate checksom for the ROM code.
+  * romcksum.exe - Executable file for Windows 10
+  * rommerge.c - Tool to merge hex files into a single combined ROM hex files
+  * rommerge.exe - Executable file for Windows 10.    
+  * romtext.c - Tool generate ROM help information from a text file, such as help.new 
+  * romtext.exe - Executable file for Windows 10.
