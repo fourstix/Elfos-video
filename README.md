@@ -63,8 +63,7 @@ Repository Contents
   * readme_original.txt - Original detailed information on how the STG v1.07 ROM is created.
 * **/utils/stg_rom/**  -- Original program hex files used to create the STG v1.07 rom
   * bios.hex - Bios routines assembled from [rileym65/Elf-BIOS](https://github.com/rileym65/Elf-BIOS)  
-  * boots.hex - Bootstrap and monitor program for the Pico/Elf v2 from the [Elf2K and PicoElf EPROM v1.07 source files](https://groups.io/g/cosmacelf/files/STG%20Elf2K/Elf2K%20and%20PicoElf%20EPROM%20v107.zip) in the files section of the [CosmacElf group](https://groups.io/g/cosmacelf) on groups.io.
-  [Spare Time Gizmos](http://www.sparetimegizmos.com/Hardware/Elf2K.htm).
+  * boots.hex - Bootstrap and monitor program for the Pico/Elf v2 from the [Elf2K and PicoElf EPROM v1.07 source files](https://groups.io/g/cosmacelf/files/STG%20Elf2K/Elf2K%20and%20PicoElf%20EPROM%20v107.zip) in the files section of the [CosmacElf group](https://groups.io/g/cosmacelf) on groups.io.  More information is available on the [Spare Time Gizmos](http://www.sparetimegizmos.com/Hardware/Elf2K.htm) website, especially in the [Cosmac ELf 2000 User's Manual](http://www.sparetimegizmos.com/Downloads/Elf2k.pdf).
   * edtasm.hex - Edit/Asm program assembled from [rileym65/Elf-EDTASM](https://github.com/rileym65/Elf-EDTASM)
   * rcbasic.hex - Rcbasic program assembled from [rileym65/Elf-RcBasic](https://github.com/rileym65/Elf-RcBasic)
   * sedit.hex - Sedit program assembled from [rileym65/Elf-Elfos-sedit](https://github.com/rileym65/Elf-Elfos-sedit)
