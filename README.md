@@ -188,16 +188,15 @@ Examples
 <table class="table table-hover table-striped table-bordered">
   <tr align="center">
    <td><img width=300 src="https://github.com/fourstix/Elfos-video/blob/main/pics/HelloWorld.jpg"></td>
-   <td><img width=300 src="https://github.com/fourstix/Elfos-video/blob/main/pics/CharSet.jpg></td> 
+   <td><img width=300 src="https://github.com/fourstix/Elfos-video/blob/main/pics/CharSet.jpg"></td> 
   </tr>
   <tr align="center">
     <td>Hello World demo</td>
     <td>Character Set Demo</td>
   </tr>
-  <!---
   <tr align="center">
    <td><img width=300 src="https://github.com/fourstix/Elfos-video/blob/main/pics/StringTest.jpg"></td>
-   <td><img width=300 src="https://github.com/fourstix/Elfos-video/blob/main/pics/SpriteDemo.jpg></td> 
+   <td><img width=300 src="https://github.com/fourstix/Elfos-video/blob/main/pics/SpriteDemo.jpg"></td> 
   </tr>
   <tr align="center">
     <td>String test demo</td>
@@ -205,13 +204,12 @@ Examples
   </tr>
   <tr align="center">
    <td><img width=300 src="https://github.com/fourstix/Elfos-video/blob/main/pics/HappyCat.jpg"></td>
-   <td><img width=300 src="https://github.com/fourstix/Elfos-video/blob/main/pics/HappyDog.jpg></td> 
+   <td><img width=300 src="https://github.com/fourstix/Elfos-video/blob/main/pics/HappyDog.jpg"></td> 
   </tr>
   <tr align="center">
     <td>Happy Cat 32x64 bit graphics demo</td>
     <td>Happy Dog 64x64 bit graphics demo</td>
   </tr>
-  --->
 </table>
 
 License Information
