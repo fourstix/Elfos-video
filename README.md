@@ -114,6 +114,12 @@ until a *vstop* command is issued.
 **CharSet**
 * Demo program to print charater set to the display.
 
+**HappyCat**
+* Demo program to draw a 32x64 bit image of a cat to the display. 
+
+**HappyDog** 
+* Demo program to draw a 64x64 bit image of a dog to the display.
+  
 **HelloWorld**
 * Demo program to print the greeting "Hello, World!" to the display.
 
@@ -178,7 +184,32 @@ Video Routines
 
 Examples
 --------
-**TBD** -- table with example pictures goes here.
+<table class="table table-hover table-striped table-bordered">
+  <tr align="center">
+   <td><img width=300 src="https://github.com/fourstix/Elfos-video/blob/main/pics/HelloWorld.jpg"></td>
+   <td><img width=300 src="https://github.com/fourstix/Elfos-video/blob/main/pics/CharSet.jpg></td> 
+  </tr>
+  <tr align="center">
+    <td>Hello World demo</td>
+    <td>Character Set Demo</td>
+  </tr>
+  <tr align="center">
+   <td><img width=300 src="https://github.com/fourstix/Elfos-video/blob/main/pics/StringTest.jpg"></td>
+   <td><img width=300 src="https://github.com/fourstix/Elfos-video/blob/main/pics/SpriteDemo.jpg></td> 
+  </tr>
+  <tr align="center">
+    <td>String test demo</td>
+    <td>Sprite Demo</td>
+  </tr>
+  <tr align="center">
+   <td><img width=300 src="https://github.com/fourstix/Elfos-video/blob/main/pics/HappyCat.jpg"></td>
+   <td><img width=300 src="https://github.com/fourstix/Elfos-video/blob/main/pics/HappyDog.jpg></td> 
+  </tr>
+  <tr align="center">
+    <td>Happy Cat 32x64 bit graphics demo</td>
+    <td>Happy Dog 64x64 bit graphics demo</td>
+  </tr>  
+  <tr align="center">
 
 License Information
 -------------------
