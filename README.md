@@ -209,8 +209,7 @@ Examples
   <tr align="center">
     <td>Happy Cat 32x64 bit graphics demo</td>
     <td>Happy Dog 64x64 bit graphics demo</td>
-  </tr>  
-  <tr align="center">
+  </tr>
 </table>
 
 License Information
