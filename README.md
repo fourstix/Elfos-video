@@ -210,11 +210,11 @@ Examples
     <td>Happy Cat 32x64 bit graphics demo</td>
     <td>Happy Dog 64x64 bit graphics demo</td>
   </tr>
-  <tr align="center" colspan="2">
-   <td><img src="https://github.com/fourstix/Elfos-video/blob/main/pics/Config.jpg"></td>
+  <tr align="center">
+   <td colspan="2"><img src="https://github.com/fourstix/Elfos-video/blob/main/pics/Config.jpg"></td>
   </tr>
-  <tr align="center" colspan="2">
-   <td>Pico/Elf v2 with the STG v1.07 + Video EPROM and an STG RTC/NVR/UART card and a PicoElf Pixie Video GLCD card showing the output from the echo command.</td>
+  <tr align="center">
+   <td colspan="2">Pico/Elf v2 with the STG v1.07 + Video EPROM and an STG RTC/NVR/UART card and a PicoElf Pixie Video GLCD card showing the output from the echo command.</td>
   </tr>
 </table>
 
