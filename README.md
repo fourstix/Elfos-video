@@ -23,24 +23,24 @@ Repository Contents
   * kernel.inc - Include file for Elf/OS kernel definitions from [rileym65/Elf-Elfos-Kernel](https://github.com/rileym65/Elf-Elfos-Kernel)
   These files are used to create the video.hex file used for the ROM images.
 * **/src/**  -- Video programs for the Elf/OS
-  * video.inc - Include file for video ROM definitions.
-  * vstart.asm - Start video by allocating video buffers in high memory and set flags. Use the vstart.bat batch file to assemble the vstart command
-  * vtest.asm - Test video and show status. Use the vtest.bat batch file to assemble vtest command.
-  * vstop.asm - Stop video, the -u option will also unload the video buffers and free up high memory.  Use the vstop.bat batch file to assemble the vstop command.
-  * cls.asm - Command to clear the display. Use the batch file Make_Cls.bat to assemble cls command.
-  * capture.asm - Command to capture the display image into a file. Use the batch file Capture.bat to assemble the capture command.
-  * draw.asm - Command to draw an image on the display. Use the Make_Draw.bat batch file to assemble the draw command.
-  * echo.asm - Command to echo text from the Elf/OS to the display. Use the Make_Echo.bat batch file to assemble the echo command.
-  * write.asm - Command to write text to the display. Use the Make_Write.bat batch file to assemble the write command.
-  * HappyCat.asm - Draw a 32x64 bit image of a cat to the display. Use the HappyCat.bat batch file to assemble the HappyCat demo.
-  * HappyDog.asm - Draw a 64x64 bit image of a dog to the display. Use the HappyDog.bat batch file to assemble the HappyDog demo.  
-  * HelloWorld.asm - Write a greeting to the display. Use the HelloWorld.bat batch file to assemble HelloWorld demo.
-  * CharSet.asm - Write the character set to the display.  Use the CharSet.bat batch file to assemble CharSet demo.
-  * SpriteDemo.asm - Draw sprites on the display.  Use the SpriteDemo.bat batch file to assemble SpriteDemo.
-  * StringTest.asm - Write various strings to the display. Use the StringTest.bat batch file to assemble StringTest demo.
-  * bios.inc - Include file for Elf/OS bios definitions from [rileym65/Elf-BIOS](https://github.com/rileym65/Elf-BIOS)
-  * kernel.inc - Include file for Elf/OS kernel definitions from [rileym65/Elf-Elfos-Kernel](https://github.com/rileym65/Elf-Elfos-Kernel)
-  * StdDefs.asm - standard definitions and macros used in assembly source files.  
+  * **video.inc** - Include file for video ROM definitions.
+  * **vstart.asm** - Start video by allocating video buffers in high memory and set flags. Use the vstart.bat batch file to assemble the vstart command
+  * **vtest.asm** - Test video and show status. Use the vtest.bat batch file to assemble vtest command.
+  * **vstop.asm** - Stop video, the -u option will also unload the video buffers and free up high memory.  Use the vstop.bat batch file to assemble the vstop command.
+  * **cls.asm** - Command to clear the display. Use the batch file Make_Cls.bat to assemble cls command.
+  * **capture.asm** - Command to capture the display image into a file. Use the batch file Capture.bat to assemble the capture command.
+  * **draw.asm** - Command to draw an image on the display. Use the Make_Draw.bat batch file to assemble the draw command.
+  * **echo.asm** - Command to echo text from the Elf/OS to the display. Use the Make_Echo.bat batch file to assemble the echo command.
+  * **write.asm** - Command to write text to the display. Use the Make_Write.bat batch file to assemble the write command.
+  * **HappyCat.asm** - Draw a 32x64 bit image of a cat to the display. Use the HappyCat.bat batch file to assemble the HappyCat demo.
+  * **HappyDog.asm** - Draw a 64x64 bit image of a dog to the display. Use the HappyDog.bat batch file to assemble the HappyDog demo.  
+  * **HelloWorld.asm** - Write a greeting to the display. Use the HelloWorld.bat batch file to assemble HelloWorld demo.
+  * **CharSet.asm** - Write the character set to the display.  Use the CharSet.bat batch file to assemble CharSet demo.
+  * **SpriteDemo.asm** - Draw sprites on the display.  Use the SpriteDemo.bat batch file to assemble SpriteDemo.
+  * **StringTest.asm** - Write various strings to the display. Use the StringTest.bat batch file to assemble StringTest demo.
+  * **bios.inc** - Include file for Elf/OS bios definitions from [rileym65/Elf-BIOS](https://github.com/rileym65/Elf-BIOS)
+  * **kernel.inc** - Include file for Elf/OS kernel definitions from [rileym65/Elf-Elfos-Kernel](https://github.com/rileym65/Elf-Elfos-Kernel)
+  * **StdDefs.asm** - standard definitions and macros used in assembly source files.  
   * These files can be compiled to run with the video routines in ROM or in the command memory, except
   for echo which works only with the video routines in ROM.  Setting the VideoCode constant to "ROM"
   in the code will use the addresses in video.inc to locate the routines, setting the VideoCode constant
@@ -63,14 +63,14 @@ Repository Contents
   * readme_original.txt - Original detailed information on how the STG v1.07 ROM is created.
 * **/utils/stg_rom/**  -- Original program hex files used to create the STG v1.07 rom
   * bios.hex - Bios routines assembled from [rileym65/Elf-BIOS](https://github.com/rileym65/Elf-BIOS)  
-  * boots.hex - Bootstrap and monitor program for the Pico/Elf v2 from the [Elf2K and PicoElf EPROM v1.07 source files](https://groups.io/g/cosmacelf/files/STG%20Elf2K/Elf2K%20and%20PicoElf%20EPROM%20v107.zip) from the [CosmacElf group](https://groups.io/g/cosmacelf) on groups.io.
+  * boots.hex - Bootstrap and monitor program for the Pico/Elf v2 from the [Elf2K and PicoElf EPROM v1.07 source files](https://groups.io/g/cosmacelf/files/STG%20Elf2K/Elf2K%20and%20PicoElf%20EPROM%20v107.zip) in the files section of the [CosmacElf group](https://groups.io/g/cosmacelf) on groups.io.
   [Spare Time Gizmos](http://www.sparetimegizmos.com/Hardware/Elf2K.htm).
   * edtasm.hex - Edit/Asm program assembled from [rileym65/Elf-EDTASM](https://github.com/rileym65/Elf-EDTASM)
   * rcbasic.hex - Rcbasic program assembled from [rileym65/Elf-RcBasic](https://github.com/rileym65/Elf-RcBasic)
   * sedit.hex - Sedit program assembled from [rileym65/Elf-Elfos-sedit](https://github.com/rileym65/Elf-Elfos-sedit)
   * visual02.hex - Visual02 program assembled from [rileym65/Elf-Visual02](https://github.com/rileym65/Elf-Visual02)
   * xmodem.hex - XModem communication routines similar to those used in [rileym65/Elf-diskless](https://github.com/rileym65/Elf-diskless)
-* **/utils/stg_rom/tools_win10** -- Spare Time Gizmos Rom tools compiled for Windows 10 using the Microsoft Visual Studio for C Community Edition C compiler. Except for a few edits to update some references for Windows 10, the source files are largely unchanged. The source file for the [Elf2K and PicoElf EPROM v1.07 source files](https://groups.io/g/cosmacelf/files/STG%20Elf2K/Elf2K%20and%20PicoElf%20EPROM%20v107.zip) from the [CosmacElf group](https://groups.io/g/cosmacelf) on groups.io.
+* **/utils/stg_rom/tools_win10** -- Spare Time Gizmos Rom tools compiled for Windows 10 using the Microsoft Visual Studio for C Community Edition C compiler. Except for a few edits to update some references for Windows 10, the source files are largely unchanged. The source files for the [Elf2K and PicoElf EPROM v1.07](https://groups.io/g/cosmacelf/files/STG%20Elf2K/Elf2K%20and%20PicoElf%20EPROM%20v107.zip) are available in the files section of the [CosmacElf group](https://groups.io/g/cosmacelf) on groups.io.
   * readme_tools.txt - Original information file from Spare Time Gizmos
   * romcksum.c - Tool to generate checksom for the ROM code.
   * romcksum.exe - Executable file for Windows 10
@@ -78,7 +78,7 @@ Repository Contents
   * rommerge.exe - Executable file for Windows 10.    
   * romtext.c - Tool generate ROM help information from a text file, such as help.new 
   * romtext.exe - Executable file for Windows 10.
-* **/pis/** -- Pictures for the repository documentation 
+* **/pis/** -- Example pictures for the repository documentation 
 
 Elf/OS Video Commands
 ---------------------
