@@ -184,6 +184,7 @@ Video Routines
 
 Examples
 --------
+
 <table class="table table-hover table-striped table-bordered">
   <tr align="center">
    <td><img width=300 src="https://github.com/fourstix/Elfos-video/blob/main/pics/HelloWorld.jpg"></td>
@@ -210,6 +211,7 @@ Examples
     <td>Happy Dog 64x64 bit graphics demo</td>
   </tr>  
   <tr align="center">
+</table>
 
 License Information
 -------------------
