@@ -225,19 +225,19 @@ Repository Contents
   * romtext.exe - Executable file for Windows 10.
 * **/pics/** -- Example pictures for the repository documentation 
 
-STG v1.10 ROM Memory Map
-------------------------
+STG v1.10 + Video ROM Memory Map
+--------------------------------
 <table class="table table-hover table-striped table-bordered">
   <tr align="center">
    <th colspan="2">Address Range</th>
    <th>Program</th>
-   <td>Number</td> 
+   <th>Size</th> 
   </tr>
   <tr align="center">
    <th>Start</th>
    <th>Stop</th>
    <th>Name</th>
-   <td>Pages</td> 
+   <th>in Pages</th> 
   </tr>
   <tr align="center">
    <td>8000H</td>
@@ -256,7 +256,48 @@ STG v1.10 ROM Memory Map
    <td>A5FFH</td> 
    <td>Video Routines</td>
    <td>9</td> 
+  </tr>
+  <tr align="center">
+   <td>A600H</td>
+   <td>B4FFH</td> 
+   <td>Forth</td>
+   <td>15</td> 
+  </tr>
+  <tr align="center">
+   <td>B500H</td>
+   <td>C1FFH</td> 
+   <td>EDTASM</td>
+   <td>13</td> 
+  </tr>     
+  <tr align="center">
+   <td>C200H</td>
+   <td>D2FFH</td> 
+   <td>Visual/02</td>
+   <td>17</td> 
   </tr>  
+  <tr align="center">
+   <td>D300H</td>
+   <td>D5FFH</td> 
+   <td>SEDIT</td>
+   <td>3</td> 
+  </tr>  
+  <tr align="center">
+   <td>D600H</td>
+   <td>EFFFH</td> 
+   <td>BASIC</td>
+   <td>26</td> 
+  </tr> 
+  <tr align="center">
+   <td>F000H</td>
+   <td>F2FFH</td> 
+   <td>XModem</td>
+   <td>3</td> 
+   <tr align="center">
+    <td>F300H</td>
+    <td>FFFFH</td> 
+    <td>BIOS</td>
+    <td>14</td> 
+  </tr>     
 </table>
 
 License Information
