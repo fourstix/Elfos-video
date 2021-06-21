@@ -41,8 +41,9 @@ PROGRAM CONTROL COMMANDS
 
 BUILT IN LANGUAGES
     BAS[ic] [NEW|OLD]		-- rc/BASIC L2 interpreter
+    FOR[th] [NEW|OLD]		-- rc/Forth interpreter    
     ASM [NEW|OLD]		-- interactive editor and assembler
-    VI[sual]                    -- Visual/02 interactive debugger
+    VI[sual]           -- Visual/02 interactive debugger
     SED[it]			-- disk sector editor
 
 MEMORY AND I/O COMMANDS
@@ -74,6 +75,7 @@ SHOW COMMANDS
 
 TEST COMMANDS
     TE[st] RAM		-- exhaustive test of system RAM
+    TE[st] PIX[ie]	-- test pixie video    
 
 OTHER COMMANDS
     HEL[p]		-- print this text
