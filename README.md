@@ -41,7 +41,7 @@ Examples
    <td colspan="2"><img src="https://github.com/fourstix/Elfos-video/blob/main/pics/Config.jpg"></td>
   </tr>
   <tr align="center">
-   <td colspan="2">Pico/Elf v2 with the STG v1.07 + Video EPROM and an STG RTC/NVR/UART card and a PicoElf Pixie Video GLCD card showing the output from the echo command.</td>
+   <td colspan="2">Pico/Elf v2 with the STG v1.10 + Video EPROM and an STG RTC/NVR/UART card and a PicoElf Pixie Video GLCD card showing the output from the echo command.</td>
   </tr>
 </table>
 
@@ -190,24 +190,32 @@ Repository Contents
   * **/bin/video/rom/** -- Binary files assembled from the source files with the video routines located in ROM.  These files can be loaded into the Elf/OS file system using the xr or xrb command.
 * **/bin/pev2_rom/**  -- Pico/Elf v2 Runtime ROM with video routines.  
   * runtime+video.hex - Hex file for Pico/Elf v2 Runtime with assembled video routines added at address A000H.
-* **/bin/stg_rom/**  -- Spare Time Gizmos v1.07 ROM with video routines.  
-  * StgVideo.hex - Hex file for Spare Time Gizmos v1.07 with RCForth removed, and assembled video routines added at address A000H.
+* **/bin/stg_rom/**  -- Spare Time Gizmos v1.10 ROM with video routines.  
+  * StgVideo.hex - Hex file for Spare Time Gizmos v1.10 and assembled video routines added at address 9D00H.
 * **/utils/pev2_rom/**  -- Utility files to create Pico/Elf v2 Runtime ROM with video routines. 
   * runtime.hex - [Hex file for Pico/Elf v2 Runtime](http://www.elf-emulation.com/software/picoelf/runtime.hex) from [Elf-Emulation](http://www.elf-emulation.com/software.html) website.    
-* **/utils/stg_rom/**  -- Utility files to create Spare Time Gizmos v1.07 ROM with video routines.  
-  * help.new - Updated help text with references to RC Forth removed. RC Forth is replaced by the video routines at address A000H.
-  * Make_Stg.bat - Batch files to run the STG ROM tools to create the STG v1.07 ROM with video routines.
+* **/utils/stg_rom/**  -- Utility files to create Spare Time Gizmos v1.10 ROM with video routines.  
+  * help.new - Updated help text with PIXIE VIDEO test enabled.
+  * Make_Stg.bat - Batch files to run the STG ROM tools to create the STG v1.10 ROM with video routines.
   * readme.txt - Updated detailed information on how the ROM is created with video routines in place of the RC Forth code.
-  * readme_original.txt - Original detailed information on how the STG v1.07 ROM is created.
-* **/utils/stg_rom/**  -- Original program hex files used to create the STG v1.07 rom
+  * readme_original.txt - Original detailed information on how the STG v1.10 ROM is created.
+* **/utils/stg_rom/boots/** -- Updated Boots Monitor program to include video Routines
+  * boots.asm - Updated Boots monitor source to include video routines.
+  * boots.inc - Included file with definitions for Boots monitor.
+  * config.inc - Included configuration definitions for Pico/Elf v2 with Pixie Video.
+  * hardware.inc - Included hardware definitions Pico/Elf v2 with Pixie Video.
+  * bios.hex - Bios routines assembled from [rileym65/Elf-BIOS](https://github.com/rileym65/Elf-BIOS) 
+  * make_boots.bat - Windows batch file to create boots.hex file
+* **/utils/stg_rom/hex/**  -- Original program hex files used to create the STG v1.10 rom
   * bios.hex - Bios routines assembled from [rileym65/Elf-BIOS](https://github.com/rileym65/Elf-BIOS)  
-  * boots.hex - Bootstrap and monitor program for the Pico/Elf v2 from the [Elf2K and PicoElf EPROM v1.07 source files](https://groups.io/g/cosmacelf/files/STG%20Elf2K/Elf2K%20and%20PicoElf%20EPROM%20v107.zip) in the files section of the [CosmacElf group](https://groups.io/g/cosmacelf) on groups.io.  More information is available on the [Spare Time Gizmos](http://www.sparetimegizmos.com/Hardware/Elf2K.htm) website, especially in the [Cosmac ELf 2000 User's Manual](http://www.sparetimegizmos.com/Downloads/Elf2k.pdf).
+  * boots.hex - Bootstrap and monitor program for the Pico/Elf v2 created from source files from the [Elf2K and PicoElf EPROM v1.10 source files](https://groups.io/g/cosmacelf/files/STG%20Elf2K/Elf2K%20and%20PicoElf%20EPROM%20v107.zip) in the files section of the [CosmacElf group](https://groups.io/g/cosmacelf) on groups.io and modified as listed above.  More information is available on the [Spare Time Gizmos](http://www.sparetimegizmos.com/Hardware/Elf2K.htm) website, especially in the [Cosmac ELf 2000 User's Manual](http://www.sparetimegizmos.com/Downloads/Elf2k.pdf).
   * edtasm.hex - Edit/Asm program assembled from [rileym65/Elf-EDTASM](https://github.com/rileym65/Elf-EDTASM)
-  * rcbasic.hex - Rcbasic program assembled from [rileym65/Elf-RcBasic](https://github.com/rileym65/Elf-RcBasic)
+  * rcbasic.hex - BASIC program assembled from [rileym65/Elf-RcBasic](https://github.com/rileym65/Elf-RcBasic)
+  * forth.hex - Forth program assembled from [rileym65/Elf-RcForth](https://github.com/rileym65/Elf-RcForth)
   * sedit.hex - Sedit program assembled from [rileym65/Elf-Elfos-sedit](https://github.com/rileym65/Elf-Elfos-sedit)
   * visual02.hex - Visual02 program assembled from [rileym65/Elf-Visual02](https://github.com/rileym65/Elf-Visual02)
   * xmodem.hex - XModem communication routines similar to those used in [rileym65/Elf-diskless](https://github.com/rileym65/Elf-diskless)
-* **/utils/stg_rom/tools_win10** -- Spare Time Gizmos Rom tools compiled for Windows 10 using the Microsoft Visual Studio for C Community Edition C compiler. Except for a few edits to update some references for Windows 10, the source files are largely unchanged. The source files for the [Elf2K and PicoElf EPROM v1.07](https://groups.io/g/cosmacelf/files/STG%20Elf2K/Elf2K%20and%20PicoElf%20EPROM%20v107.zip) are available in the files section of the [CosmacElf group](https://groups.io/g/cosmacelf) on groups.io.
+* **/utils/stg_rom/tools_win10** -- Spare Time Gizmos Rom tools compiled for Windows 10 using the Microsoft Visual Studio for C Community Edition C compiler. Except for a few edits to update some references for Windows 10, the source files are largely unchanged. The source files for the [Elf2K and PicoElf EPROM v1.10](https://groups.io/g/cosmacelf/files/STG%20Elf2K/Elf2K%20and%20PicoElf%20EPROM%20v110%20BIOS%201.0.9.zip) are available in the files section of the [CosmacElf group](https://groups.io/g/cosmacelf) on groups.io.
   * readme_tools.txt - Original information file from Spare Time Gizmos
   * romcksum.c - Tool to generate checksom for the ROM code.
   * romcksum.exe - Executable file for Windows 10
@@ -215,7 +223,41 @@ Repository Contents
   * rommerge.exe - Executable file for Windows 10.    
   * romtext.c - Tool generate ROM help information from a text file, such as help.new 
   * romtext.exe - Executable file for Windows 10.
-* **/pis/** -- Example pictures for the repository documentation 
+* **/pics/** -- Example pictures for the repository documentation 
+
+STG v1.10 ROM Memory Map
+------------------------
+<table class="table table-hover table-striped table-bordered">
+  <tr align="center">
+   <th colspan="2">Address Range</th>
+   <th>Program</th>
+   <td>Number</td> 
+  </tr>
+  <tr align="center">
+   <th>Start</th>
+   <th>Stop</th>
+   <th>Name</th>
+   <td>Pages</td> 
+  </tr>
+  <tr align="center">
+   <td>8000H</td>
+   <td>94FFH</td> 
+   <td>Boots Monitor</td>
+   <td>18</td> 
+  </tr>
+  <tr align="center">
+   <td>9500H</td>
+   <td>9CFFH</td> 
+   <td>Help Menu</td>
+   <td>8</td> 
+  </tr>
+  <tr align="center">
+   <td>9D00H</td>
+   <td>A5FFH</td> 
+   <td>Video Routines</td>
+   <td>9</td> 
+  </tr>  
+</table>
 
 License Information
 -------------------
@@ -244,7 +286,7 @@ Copyright (c) 2004-2021 by Mike Riley.
 Elf/OS BIOS and Elf/OS Software
 Copyright (c) 2004-2021 by Mike Riley.
 
-Spare Time Gizmos Pico Elf EProm v1.07 
+Spare Time Gizmos Pico Elf EProm v1.10 
 Copyright (C) 2004-2021 by Spare Time Gizmos
  
 Many thanks to the original authors for making their designs and code available as open source.
