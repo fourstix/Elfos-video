@@ -94,8 +94,8 @@ until a *vstop* command is issued.
 **StringTest**
 * Demo program to print various strings to the display.
 
-Video Routines API
-------------------
+Video API
+---------
 **ValidateVideo** - Validate video buffers are loaded into high memory
 * Returns RF.0 equal Zero if valid, non-zero if not valid
 
@@ -254,7 +254,7 @@ STG v1.10 + Video ROM Memory Map
   <tr align="center">
    <td>9D00H</td>
    <td>A5FFH</td> 
-   <td>Video Routines</td>
+   <td>Video API</td>
    <td>9</td> 
   </tr>
   <tr align="center">
