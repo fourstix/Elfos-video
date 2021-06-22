@@ -94,8 +94,8 @@ until a *vstop* command is issued.
 **StringTest**
 * Demo program to print various strings to the display.
 
-Video Routines
---------------
+Video Routines API
+------------------
 **ValidateVideo** - Validate video buffers are loaded into high memory
 * Returns RF.0 equal Zero if valid, non-zero if not valid
 
