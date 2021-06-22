@@ -189,26 +189,26 @@ Repository Contents
   * **/bin/video/mem/** -- Binary files assembled from the source files with the video routines located in memory.  These files can be loaded into the Elf/OS file system using the xr or xrb command.
   * **/bin/video/rom/** -- Binary files assembled from the source files with the video routines located in ROM.  These files can be loaded into the Elf/OS file system using the xr or xrb command.
 * **/bin/pev2_rom/**  -- Pico/Elf v2 Runtime ROM with video routines.  
-  * runtime+video.hex - Hex file for Pico/Elf v2 Runtime with assembled video routines added at address A000H.
+  * runtime+video.hex - Hex file for Pico/Elf v2 Runtime with assembled video routines added at address 9D00H.
 * **/bin/stg_rom/**  -- Spare Time Gizmos v1.10 ROM with video routines.  
   * StgVideo.hex - Hex file for Spare Time Gizmos v1.10 and assembled video routines added at address 9D00H.
 * **/utils/pev2_rom/**  -- Utility files to create Pico/Elf v2 Runtime ROM with video routines. 
   * runtime.hex - [Hex file for Pico/Elf v2 Runtime](http://www.elf-emulation.com/software/picoelf/runtime.hex) from [Elf-Emulation](http://www.elf-emulation.com/software.html) website.    
 * **/utils/stg_rom/**  -- Utility files to create Spare Time Gizmos v1.10 ROM with video routines.  
-  * help.new - Updated help text with PIXIE VIDEO test enabled.
+  * help.new - Updated help text with Pixie Video test enabled.
   * Make_Stg.bat - Batch files to run the STG ROM tools to create the STG v1.10 ROM with video routines.
   * readme.txt - Updated detailed information on how the ROM is created with video routines in place of the RC Forth code.
   * readme_original.txt - Original detailed information on how the STG v1.10 ROM is created.
-* **/utils/stg_rom/boots/** -- Updated Boots Monitor program to include video Routines
+* **/utils/stg_rom/boots/** -- Updated Boots monitor program to include video routines and pixie video test.  Based on source files from the [Elf2K and PicoElf EPROM v1.10 source files](https://groups.io/g/cosmacelf/files/STG%20Elf2K/Elf2K%20and%20PicoElf%20EPROM%20v107.zip) in the files section of the [CosmacElf group](https://groups.io/g/cosmacelf) on groups.io.  More information is available on the [Spare Time Gizmos](http://www.sparetimegizmos.com/Hardware/Elf2K.htm) website, especially in the [Cosmac ELf 2000 User's Manual](http://www.sparetimegizmos.com/Downloads/Elf2k.pdf).
   * boots.asm - Updated Boots monitor source to include video routines.
   * boots.inc - Included file with definitions for Boots monitor.
-  * config.inc - Included configuration definitions for Pico/Elf v2 with Pixie Video.
-  * hardware.inc - Included hardware definitions Pico/Elf v2 with Pixie Video.
+  * config.inc - Included configuration definitions for a Pico/Elf v2 with Pixie Video.
+  * hardware.inc - Included hardware definitions for a Pico/Elf v2 with Pixie Video.
   * bios.hex - Bios routines assembled from [rileym65/Elf-BIOS](https://github.com/rileym65/Elf-BIOS) 
   * make_boots.bat - Windows batch file to create boots.hex file
 * **/utils/stg_rom/hex/**  -- Original program hex files used to create the STG v1.10 rom
   * bios.hex - Bios routines assembled from [rileym65/Elf-BIOS](https://github.com/rileym65/Elf-BIOS)  
-  * boots.hex - Bootstrap and monitor program for the Pico/Elf v2 created from source files from the [Elf2K and PicoElf EPROM v1.10 source files](https://groups.io/g/cosmacelf/files/STG%20Elf2K/Elf2K%20and%20PicoElf%20EPROM%20v107.zip) in the files section of the [CosmacElf group](https://groups.io/g/cosmacelf) on groups.io and modified as listed above.  More information is available on the [Spare Time Gizmos](http://www.sparetimegizmos.com/Hardware/Elf2K.htm) website, especially in the [Cosmac ELf 2000 User's Manual](http://www.sparetimegizmos.com/Downloads/Elf2k.pdf).
+  * boots.hex - Bootstrap and monitor program for the Pico/Elf v2 created from source files based on the [Elf2K and PicoElf EPROM v1.10 source files](https://groups.io/g/cosmacelf/files/STG%20Elf2K/Elf2K%20and%20PicoElf%20EPROM%20v107.zip) in the files section of the [CosmacElf group](https://groups.io/g/cosmacelf) on groups.io and modified as listed above.  More information is available on the [Spare Time Gizmos](http://www.sparetimegizmos.com/Hardware/Elf2K.htm) website, especially in the [Cosmac ELf 2000 User's Manual](http://www.sparetimegizmos.com/Downloads/Elf2k.pdf).
   * edtasm.hex - Edit/Asm program assembled from [rileym65/Elf-EDTASM](https://github.com/rileym65/Elf-EDTASM)
   * rcbasic.hex - BASIC program assembled from [rileym65/Elf-RcBasic](https://github.com/rileym65/Elf-RcBasic)
   * forth.hex - Forth program assembled from [rileym65/Elf-RcForth](https://github.com/rileym65/Elf-RcForth)
