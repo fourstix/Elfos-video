@@ -32,7 +32,7 @@
 ; RE.1          Used by Elf/OS for baud rate
 ; =========================================================================================
 
-                      ORG 0A000H 
+                      ORG 09D00H 
                     INCLUDE "InitPicoElf.asm"
 
 ;------ define end of execution block
