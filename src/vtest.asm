@@ -109,6 +109,20 @@ v_page:     CALL O_INMSG
             
             LOAD RF, buffer
             CALL O_MSG
+        
+; Echo is only available when video routines are in ROM    
+    IF VideoCode == "ROM"        
+            CALL O_INMSG
+            db   "Echo is ",0
+            CALL GetEchoFlag        ; check echo status
+            GLO  RF
+            BZ   echo_off            ; zero means echo is off
+            CALL O_INMSG
+            db "ON.",10,13,0
+            BR exit
+echo_off:   CALL O_INMSG
+            db "OFF.",10,13,0        
+    ENDIF
                
 exit:       RETURN                  ; return to Elf/OS
 
