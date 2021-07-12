@@ -109,6 +109,7 @@ Video API
 
 **IsVideoReady** -- Test if video buffers are loaded and video is on.
 * Returns RF.0 non-zero (true) if ready, zero if not ready
+* Safe - This function saves and restores registers used.
 
 **UpdateVideo** -- Update the video display. Briefly turns on Interrupts and DMA to update display.
 
@@ -123,8 +124,9 @@ Video API
 **Print** -- Write a string to the display at the cursor position.
 * RF contains an pointer to the address of the character buffer with the null-terminated string.
 
-**GetEchoFlag** -- Get the status of the Echo function
-* Returns RF.0 with the value of Echo flag. Zero means echo is off; non-zero means echo is on.
+**IsEchoOn** -- Get the status of the Echo function
+* Returns RF.0 non-zero (true) if on, zero if off.
+* Safe - This function saves and restores registers used.
 
 **EchoOn** -- Turn echo on. Text written by O_TYPE, O_MSG and O_INMSG will be printed to the display and to the serial output.
 
@@ -147,6 +149,18 @@ Video API
 * RD contains the size of the sprite in bytes
 * RF contains the address pointer to a buffer with the sprite image data.
 
+**DrawPixel** -- Draw a pixel on the display
+* RA.0 contains the X coordinate of the pixel to set
+* RA.1 contains the Y coordinate of the pixel to set
+
+**SaveVideoRegs** -- Save all registers affected by video routines into the video buffer
+* The R9, RA, RB, RC, RD and RF registers are saved in the video buffer.
+* Safe - This function can be used to save video registers before calling video routines.
+
+**RestoreVideoRegs** -- Restore all registers affected by video routines from the video buffer
+* Restore the R9, RA, RB, RC, RD and RF registers with values retrieved from the video buffer.
+* Safe - This function can be used to restore video registers before calling video routines.
+ 
 Repository Contents
 -------------------
 * **/src/video/**  -- Assembly code source files for the Elf/OS Video functions.
@@ -176,6 +190,7 @@ Repository Contents
   * **CharSet.asm** - Write the character set to the display.  Use the CharSet.bat batch file to assemble CharSet demo.
   * **SpriteDemo.asm** - Draw sprites on the display.  Use the SpriteDemo.bat batch file to assemble SpriteDemo.
   * **StringTest.asm** - Write various strings to the display. Use the StringTest.bat batch file to assemble StringTest demo.
+* **PixelDemo.asm** - Draw pixels on the display.  Use the PixelDemo.bat batch file to assemble PixelDemo.
   * **bios.inc** - Include file for Elf/OS bios definitions from [rileym65/Elf-BIOS](https://github.com/rileym65/Elf-BIOS)
   * **kernel.inc** - Include file for Elf/OS kernel definitions from [rileym65/Elf-Elfos-Kernel](https://github.com/rileym65/Elf-Elfos-Kernel)
   * **StdDefs.asm** - standard definitions and macros used in assembly source files.  
