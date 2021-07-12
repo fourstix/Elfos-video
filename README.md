@@ -160,6 +160,26 @@ Video API
 **RestoreVideoRegs** -- Restore all registers affected by video routines from the video buffer
 * Restore the R9, RA, RB, RC, RD and RF registers with values retrieved from the video buffer.
 * Safe - This function can be used to restore video registers before calling video routines.
+
+Video API Notes
+---------------
+* AllocateVideoBuffers should be called first to set up the Video Buffers into HiMem.
+  The ValidateVideo function can be used to verify video buffers are allocated.
+
+* VideoOn should be called to initialize the system variables, and the UpdateVideo
+  function should be used to display the video buffer after a change.
+
+* VideoOff should be used to turn the video off and clear the system variables.
+
+* The UnloadVideo can be used to return video buffer memory to the system.
+
+* The Video functions IsVidoeReady and IsEchoOn check save and restore registers used and are 
+  safe. The other video functions do not preserve register values and are unsafe.
+
+* The  SaveVideoRegs and RestoreVideoRegs functions can be used to make video functions safe
+  by saving affected registers in the video buffer before any calls to video routines, and then restoring them afterwards.
+
+
  
 Repository Contents
 -------------------
@@ -190,7 +210,7 @@ Repository Contents
   * **CharSet.asm** - Write the character set to the display.  Use the CharSet.bat batch file to assemble CharSet demo.
   * **SpriteDemo.asm** - Draw sprites on the display.  Use the SpriteDemo.bat batch file to assemble SpriteDemo.
   * **StringTest.asm** - Write various strings to the display. Use the StringTest.bat batch file to assemble StringTest demo.
-* **PixelDemo.asm** - Draw pixels on the display.  Use the PixelDemo.bat batch file to assemble PixelDemo.
+  * **PixelDemo.asm** - Draw pixels on the display.  Use the PixelDemo.bat batch file to assemble PixelDemo.
   * **bios.inc** - Include file for Elf/OS bios definitions from [rileym65/Elf-BIOS](https://github.com/rileym65/Elf-BIOS)
   * **kernel.inc** - Include file for Elf/OS kernel definitions from [rileym65/Elf-Elfos-Kernel](https://github.com/rileym65/Elf-Elfos-Kernel)
   * **StdDefs.asm** - standard definitions and macros used in assembly source files.  
