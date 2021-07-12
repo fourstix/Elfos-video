@@ -58,12 +58,12 @@ VideoCode EQU "ROM"
             br     start              ; Jump past build info to code
 
 ; Build information
-binfo:      db      80H+5             ; Month, 80H offset means extended info
-            db      11                ; Day
+binfo:      db      80H+7             ; Month, 80H offset means extended info
+            db      9                 ; Day
             dw      2021              ; Year
 
 ; Current build number
-build:      dw      2
+build:      dw      3
 
             ; Must end with 0 (null)
             db      'Copyright 2021 Gaston Williams',0
@@ -77,7 +77,7 @@ start:      CALL O_INMSG
         
             CALL O_INMSG
             db "*NOT* loaded.",10,13,0
-            RETURN
+            LBR O_WRMBOOT
           
 already:    CALL O_INMSG
             db "loaded.",10,13,0
@@ -114,7 +114,7 @@ v_page:     CALL O_INMSG
     IF VideoCode == "ROM"        
             CALL O_INMSG
             db   "Echo is ",0
-            CALL GetEchoFlag        ; check echo status
+            CALL IsEchoOn            ; check echo status
             GLO  RF
             BZ   echo_off            ; zero means echo is off
             CALL O_INMSG
@@ -124,7 +124,7 @@ echo_off:   CALL O_INMSG
             db "OFF.",10,13,0        
     ENDIF
                
-exit:       RETURN                  ; return to Elf/OS
+exit:       LBR O_WRMBOOT            ; return to Elf/OS
 
 buffer:     db 0,0,0,0,10,13,0
 

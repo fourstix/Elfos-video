@@ -50,12 +50,12 @@ VideoCode EQU "ROM"
                     BR  start           ; Jump past build info to code
 
 ; Build information
-binfo:              db  80H+5           ; Month, 80H offset means extended info
-                    db  11              ; Day
+binfo:              db  80H+7           ; Month, 80H offset means extended info
+                    db  10              ; Day
                     dw  2021            ; Year
 
                     ; Current build number
-build:              dw  2
+build:              dw  3
 
                     ; Must end with 0 (null)
                     db  'Copyright 2021 Gaston Williams',0
@@ -69,13 +69,13 @@ start:							CALL IsVideoReady
                     BNZ  loaded
                     LOAD RF, failed
                     CALL O_MSG
-                    RETURN
+                    LBR O_WRMBOOT           ; return to Elf/OS
                         
 loaded:             CALL ClearScreen        ; Clear the screen
                     CALL BigSprites				  ; Draw the sprites
 										CALL UpdateVideo        ; show video updates
 																																		 
-										RETURN                  ; return to Elf/OS
+										LBR O_WRMBOOT           ; return to Elf/OS
 ;------------------------------------------------------------------------------------------
 
 

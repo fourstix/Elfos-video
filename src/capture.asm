@@ -49,12 +49,12 @@ VideoCode EQU "ROM"
                     br  start                   ; Jump past build info to code
 
 ; Build information
-binfo:              db  80H+5            ; April
-                    db  11               ; Day
+binfo:              db  80H+7            ; Month
+                    db  10               ; Day
                     dw  2021             ; Year
 
                     ; Current build number
-build:              dw  2
+build:              dw  3
 
                     ; Must end with 0 (null)
                     db  'Copyright 2021 Gaston Williams',0
@@ -82,7 +82,7 @@ findend:    	      LDA	 RF		            ; look for first non printable char
                   	BNZ	 openfile		      ; if so, try opening it as a file
                     LOAD RF, usage
                   	CALL O_MSG		        ; otherwise display usage message
-                  	RETURN  
+                  	LBR O_WRMBOOT         ; return to os
 
 openfile:           LOAD RD, fildes	      ; image file descriptor in RD
                     LDI  0
@@ -94,7 +94,7 @@ openfile:           LOAD RD, fildes	      ; image file descriptor in RD
                     
                     LOAD RF, errmsg
                     CALL O_MSG
-                    RETURN                ; return to os
+                    LBR O_WRMBOOT          ; return to os
 
 filegood:           CALL ValidateVideo    ; check if video is loaded                  
                     GLO  RF               ; RF.0 is zero if video loaded
@@ -114,7 +114,7 @@ loaded:             LOAD R9, O_VIDEO      ; prepare the pointer to the video buf
                     
 close_exit:         LOAD RD, fildes       ; RD points to file descriptor 
                     CALL  O_CLOSE         ; close the file
-                    RETURN                ; return to os
+                    LBR O_WRMBOOT         ; return to os
            
            
 

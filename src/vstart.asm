@@ -57,12 +57,12 @@ VideoCode EQU "ROM"
                     br     start            ; Jump past build info to code
 
 ; Build information
-binfo:              db      80H+5           ; Month, 80H offset means extended info
+binfo:              db      80H+7           ; Month, 80H offset means extended info
                     db      11              ; Day
                     dw      2021            ; Year
 
 ; Current build number
-build:              dw      2
+build:              dw      3
 
                     ; Must end with 0 (null)
                     db      'Copyright 2021 Gaston Williams',0
@@ -76,23 +76,27 @@ allocate:           CALL AllocateVideoBuffers   ; allocate video buffers in hime
             
                     CALL ValidateVideo          ; validate video drivers loaded okay
                     GLO RF
-                    BZ loaded
+                    BZ verbose
                     LOAD RF, failed
                     CALL O_MSG 
                     NOP
-                    RETURN 
+                    LBR O_WRMBOOT 
+                    
+verbose:            LOAD RF, descript           ; show description and copyright
+                    CALL O_MSG
+                    LOAD RF, notice  
+                    CALL O_MSG
                                         
 loaded:             CALL VideoOn                ; turn video on
-                    
                     LOAD RF, started  
-                    CALL O_MSG   
-                    NOP                 
-                    RETURN                      ; return to Elf/OS 
+                    CALL O_MSG              
+                    LBR O_WRMBOOT               ; return to Elf/OS 
                     
                                 
 failed:             db   "Video drivers failed to load.",10,13,0
 started:            db   "Video started.",10,13,0
-
+descript:           db   "Elf/OS 1861 Pixie Video Drivers v3.01",10,13,0
+notice:             db   "Copyright (c) 2021 by Gaston Williams",10,13,0
 ; ************************************************************
 ; Assemble video routines in memory
 ; ************************************************************                        

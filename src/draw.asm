@@ -51,12 +51,12 @@ VideoCode EQU "ROM"
                     br  start             ; Jump past build info to code
 
 ; Build information
-binfo:              db  80H+5           ; May
-                    db  11              ; Day
+binfo:              db  80H+7           ; Month
+                    db  10              ; Day
                     dw  2021            ; Year
 
                     ; Current build number
-build:              dw  2
+build:              dw  3
 
                     ; Must end with 0 (null)
                     db  'Copyright 2021 Gaston Williams',0
@@ -84,7 +84,7 @@ find_end:           LDA	RF		; look for first non printable char
                   	BNZ  	check_video  ; yep, try opening it as a file
                     LOAD  RF,usage
                   	CALL	O_MSG		     ; otherwise display usage message
-                  	RETURN
+                  	LBR O_WRMBOOT      ; return to Elf/OS
 
                     ; Check video then see if we can open the file 
 check_video:        PUSH RF                 ; save RF on stack
@@ -94,7 +94,7 @@ check_video:        PUSH RF                 ; save RF on stack
                     POP  RF                 ; restore stack location
                     LOAD RF, failed
                     CALL O_MSG
-                    RETURN
+                    LBR O_WRMBOOT           ; return to Elf/OS
 
 open_img:           POP  RF              ; retore RF
                     LOAD RD,fildes	     ; image file descriptor
@@ -105,7 +105,7 @@ open_img:           POP  RF              ; retore RF
                     BNF  opened	        ; DF=0, file was opened
                     LOAD RF, not_found
                     CALL O_MSG
-                    RETURN	            ; return to Elf/OS
+                    LBR O_WRMBOOT	      ; return to Elf/OS
                     
 opened:         	  LOAD RC,512         ; read up to 512 bytes 
                     LOAD RF,buff1
@@ -131,7 +131,7 @@ update:             CALL UpdateVideo        ; update display
                     
 close_exit:         LOAD  RD,fildes
                     CALL	O_CLOSE		        ; close the image file
-                    RETURN      	          ; return to Elf/OS
+                    LBR O_WRMBOOT      	    ; return to Elf/OS
 
                     
 size_err:         	LOAD  RF,bad_size

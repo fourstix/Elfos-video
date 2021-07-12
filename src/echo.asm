@@ -44,12 +44,12 @@
                     BR  start           ; Jump past build info to code
 
 ; Build information
-binfo:              db  80H+5           ; Month, 80H offset means extended info
-                    db  11              ; Day
+binfo:              db  80H+7           ; Month, 80H offset means extended info
+                    db  9               ; Day
                     dw  2021            ; Year
 
                     ; Current build number
-build:              dw  2
+build:              dw  3
 
                     ; Must end with 0 (null)
                     db  'Copyright 2021 Gaston Williams',0
@@ -63,20 +63,20 @@ start:              CALL ValidateVideo      ; check if video is loaded
                     BZ   loaded
                     LOAD RF, failed
                     CALL O_MSG
-                    RETURN
+                    LBR  O_WRMBOOT          ; return to Elf/OS
                         
-loaded:             CALL GetEchoFlag        ; check echo status
+loaded:             CALL IsEchoOn           ; check echo status
                     GLO  RF
                     BZ   turn_on            ; zero means echo is off
                     CALL EchoOff            ; turn echo off
                     LOAD RF, echo_off
                     CALL O_MSG
-                    RETURN    
+                    LBR  O_WRMBOOT          ; return to Elf/OS
                     
 turn_on:            CALL EchoOn             ; turn echo on                    
                     LOAD RF, echo_on
                     CALL O_MSG
-                    RETURN  
+                    LBR  O_WRMBOOT          ; return to Elf/OS
                     
 failed:             db "Video is not started.",10,13,0
 echo_on:            db "Echo is on.",10,13,0 

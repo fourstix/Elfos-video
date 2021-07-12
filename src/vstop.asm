@@ -57,12 +57,12 @@ VideoCode EQU "ROM"
                     br  start             ; Jump past build info to code
 
 ; Build information
-binfo:              db  80H+5             ; Month, 80H offset means extended info
-                    db  11                ; Day
+binfo:              db  80H+7             ; Month, 80H offset means extended info
+                    db  9                ; Day
                     dw  2021              ; Year
 
 ; Current build number
-build:              dw  1
+build:              dw  3
 
 ; Must end with 0 (null)
                     db      'Copyright 2021 Gaston Williams',0
@@ -89,12 +89,12 @@ check:              CALL ValidateVideo      ; RF.0 nonzero if drivers loaded
                                    
 bad_arg:            LOAD RF, usage          ; print bad arg message and end
                     CALL O_MSG
-                    RETURN
+                    LBR O_WRMBOOT
                     
 unload:             CALL ValidateVideo      ; check for video first
                     GLO  RF
                     BNZ  fail               ; fail if drivers are not loaded
-                    CALL GetEchoFlag        ; see if echo is on
+                    CALL IsEchoOn           ; see if echo is on
                     GLO  RF
                     BZ   continue
                     CALL EchoOff            ; turn off echo if needed
@@ -108,15 +108,15 @@ continue:           CALL VideoOff           ; always stop the video
                                      
 cleared:            LOAD RF, removed
                     CALL O_MSG 
-                    RETURN       
+                    LBR O_WRMBOOT       
                                             ; continue on to print stop message
 done:               LOAD RF, stopped
                     CALL O_MSG
-                    RETURN                  ; return to Elf/OS 
+                    LBR O_WRMBOOT                  ; return to Elf/OS 
                       
 fail:               LOAD RF, failed
                     CALL O_MSG
-                    RETURN                  ; return to Elf/OS
+                    LBR O_WRMBOOT                  ; return to Elf/OS
                                    
 
 failed:             db   "Video drivers are not loaded.",10,13,0

@@ -3,7 +3,7 @@
 ; Copyright (c) 2020-2021 by Gaston Williams
 ;
 ; These functions implement basic terminal functions in 64x64 bit graphics.
-
+;
 ; Notes:
 ;       1. AllocateVideoBuffers should be called first to set up the Video Buffers into HiMem.
 ;       The ValidateVideo function can be used to verify video buffers are allocated.
@@ -15,10 +15,18 @@
 ;
 ;       4. The UnloadVideo can be used to return video buffer memory to the system.
 ;
+;       5. Safe Video functions check save and restore registers.  Unsafe functions do not
+;       preserve register values.
+;
+;       6. The  SaveVideoRegs and RestoreVideoRegs functions can be used to make unsafe 
+;       video functions safe by saving affected registers in the video buffer before any 
+;       calls to video routines, and then restoring them afterwards.
+;
 ; Changes:
 ; Gaston Williams, Sept, 2020 - Original TTY video code
 ; Gaston Williams, Nov,  2020 - Added support for EOT to clear screen
 ; Gaston Williams, May,  2021 - Added support for video buffers in HiMem
+; Gaston Williams, July, 2021 - Fixed issues with Save/Restore registers
 ; *******************************************************************************************
 
 ; **************************************************************
@@ -30,7 +38,7 @@ O_VIDEO:            EQU  03D0H
 ; =========================================================================================
 ; HandleControlChar - Process a control character and move the cursor on screen
 ;
-; Note: Video should be off when calling this function.
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ;
 ; Parameters:
 ; RC.0          ASCII code of the character (20 - 5F)
@@ -116,6 +124,8 @@ HCC_Exit:               RETURN
 ; =========================================================================================
 ; PutChar - Write a character on the screen and advance the cursor
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
 ; Parameters:
 ; RC.0          ASCII code of the character (20 - 5F)
 ;
@@ -171,7 +181,7 @@ WC_Exit:                RETURN
 ; Note: This function is called before any other video functions
 ;
 ; Internal:
-; RD            Pointer to intrrupt service routine
+; RD            Pointer to interrupt service routine
 ; RF.0          Value to set Video Flag false
 ;
 ; Return: 
@@ -183,7 +193,7 @@ VideoOn:                LOAD R1, DisplayInt
                         PLO  RF
                         CALL SetVideoFlag
 
-                        LDI  00H                ; set the video flag to true
+                        LDI  00H                ; set the video flag off
                         PLO  RF
                         CALL SetEchoFlag
 
@@ -229,6 +239,7 @@ VideoOff:               LDI  0FFH               ; Set value to clear display
 ; =========================================================================================
 ; Create a pointer into a Video buffer at the location specified by Y location
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ; Note: Internal function used to manipulator pointer into video buffer
 ;
 ; Parameters:
@@ -266,6 +277,7 @@ VY_SkipLowInc:          RETURN
 ; =========================================================================================
 ; Add the X byte offset to a pointer into a Video buffer
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ; Note: Internal function used to manipulator pointer into video buffer
 ;
 ; Parameters:
@@ -310,7 +322,7 @@ VideoOffsetX:           GLO  RA         ; get the x bit position
 ; Clear a line of text on the video console (6 rows of pixels at 8 bytes per row) along
 ; with the 2 rows of the next row of text.
 ;
-; Note: Video should be off when calling this function.
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ;
 ; Parameters:
 ; RA.0          X coordinate of the character
@@ -345,6 +357,8 @@ BL_Loop:                LDI  00H
 ; =========================================================================================
 ; Advance cursor to next tab stop: 08H, 10H, 18H, 20H, 28H, 30H, 38H, 00H (NextLine)
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
 ; Parameters:
 ; RA.0          X coordinate of the character
 ; RA.1          Y coordinate of the character
@@ -372,6 +386,7 @@ TAB_Exit:               RETURN
 ; =========================================================================================
 ; Move cursor back one position and delete the character
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ; Note: Video should be off before calling this function.
 ;
 ; Parameters:
@@ -386,8 +401,8 @@ TAB_Exit:               RETURN
 ; RA.1          Updated Y coordinate
 ; =========================================================================================
 
-Backspace:              LDI  04H                ; average charcter width = 4 pixels
-                        PLO  RF                 ; RD.0 has width to back pu
+Backspace:              LDI  04H                ; average character width = 4 pixels
+                        PLO  RF                 ; RD.0 has width to back up
                         CALL LeftCursor         ; Move cursor back one character
 
                         CALL BlankCharacter     ; erase the previous character
@@ -398,6 +413,7 @@ Backspace:              LDI  04H                ; average charcter width = 4 pix
 ; =========================================================================================
 ; Move cursor back one pixel position and clear the column
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ; Note: Video should be off before calling this function.
 ;
 ; Parameters:
@@ -424,6 +440,8 @@ Rubout:                 LDI  01H                ; rubout one column of pixels
 ; =========================================================================================
 ; Move cursor forward one pixel position
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
 ; Parameters:
 ; RA.0          X coordinate of the character
 ; RA.1          Y coordinate of the character
@@ -445,6 +463,8 @@ UnitSeparator:          LDI  00H                ; put zero as character width
                         
 ; =========================================================================================
 ; Clear line and position cursror at the begining of the current line.
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ;
 ; Note: Video should be off before calling this function.
 ;
@@ -469,6 +489,7 @@ CancelLine:             LDI  00H                ; load zero and save as cursorX
 ; =========================================================================================
 ; Create mask for blanking character bits in video buffer
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ; Note: Internal function used for removing character pixels
 ;
 ; Parameters:
@@ -505,7 +526,9 @@ CM_Done:                GHI  RD                 ; get mask value
 ;------------------------------------------------------------------------------------------
 
 ; =========================================================================================
-; Advance cursor to begining of the next line.
+; Advance cursor to beginning of the next line.
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ;
 ; Parameters:
 ; RA.0          X coordinate of the character
@@ -553,6 +576,7 @@ SetVideoFlag:           CALL GetVideoFlagPointer
 ; =========================================================================================
 ; Advance cursor down to next line without changing x location
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ; Note: Video should be off before calling this function.
 ;
 ; Parameters:
@@ -584,6 +608,8 @@ DC_Blank:               CALL BlankLine          ; erase existing text
 ; =========================================================================================
 ; ClearScreen - Blank the video screen and home the cursor.
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
 ; Internal:
 ; RF.1          zero value to fill screen
 ; RA.0          X coordinate of the character
@@ -608,6 +634,8 @@ ClearScreen:            LDI  00H                ; clear screen
 ; =========================================================================================
 ; SetCursor - Save the Cursor value into memory
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
 ; Parameters:
 ; RA.0          X coordinate of the character
 ; RA.1          Y coordinate of the character
@@ -628,6 +656,8 @@ SetCursor:              CALL GetCursorXY    ; get pointer to the x,y cursor loca
 
 ; =========================================================================================
 ; GetCursor - Read the Cursor value from memory
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ;
 ; Parameters:
 ;
@@ -651,6 +681,8 @@ GetCursor:              Call GetCursorXY        ; get the location of x,y cursor
 ; =========================================================================================
 ; GetCursorXY - Get a pointer to the Cursor X, Y buffers
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
 ; Parameters:
 ;
 ; Internal:
@@ -671,6 +703,8 @@ GetCursorXY:            LOAD R9, O_VIDEO
 ; =========================================================================================
 ; WriteHexOutput - Write a value out to the hex display
 ;
+; Safe - This function does not affect any video registers
+;
 ; Parameters:
 ; RC.0          Value to be shown on the hex display
 ; =========================================================================================
@@ -687,6 +721,8 @@ WriteHexOutput:         GLO  RC         ; Get byte to display
 ; =========================================================================================
 ; GetVideoFlagPointer - Get a pointer to the Video Flag buffer
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
 ; Parameters:
 ;
 ; Internal:
@@ -695,7 +731,7 @@ WriteHexOutput:         GLO  RC         ; Get byte to display
 ; Returns:
 ; RD            Pointer Video Flag
 ; =========================================================================================
-GetVideoFlagPointer:         LOAD R9, O_VIDEO
+GetVideoFlagPointer:    LOAD R9, O_VIDEO
                         LDN  R9
                         ADI  02H        ; Video buffers 2 pages after display buffer start
                         PHI  RD
@@ -706,6 +742,8 @@ GetVideoFlagPointer:         LOAD R9, O_VIDEO
 
 ; =========================================================================================
 ; Move cursor backwards a number of pixel widths
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ;
 ; Parameters:
 ; RF.0          Width to back up cursor
@@ -760,6 +798,8 @@ LC_Exit:                RETURN
 ; =========================================================================================
 ; Move cursor forwards a number of pixel widths
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
 ; Parameters:
 ; RF.0          Width to advance cursor
 ; RA.0          X coordinate of the character
@@ -802,7 +842,7 @@ RC_Exit:                RETURN
 ; =========================================================================================
 ; Clear character pixels from the current cursor location
 ;
-; Note: Video should be off when calling this function.
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ;
 ; Parameters:
 ; RA.0          X coordinate of the character
@@ -822,7 +862,7 @@ BlankCharacter:         CALL VideoOffsetY       ; set pointer to video at y loca
                         GLO  RA                 ; check x location
                         BNZ  BCH_GetMask        ; if inside line, calculate masks
 
-                        CALL BlankLine          ; if we are the begining, just clear the line
+                        CALL BlankLine          ; if at the beginning, clear the line
                         BR   BCH_Done
 
 BCH_GetMask:            CALL CreateMask         ; get the mask for video bits
@@ -868,6 +908,7 @@ BCH_Done:               RETURN
 ; =========================================================================================
 ; WaitForInput - Wait for Input key press and release.  No data is read.
 ;
+; Safe - This function does not affect any registers
 ; =========================================================================================
 
 WaitForInput:           BN4  WaitForInput       ; Wait for Input press
@@ -881,7 +922,7 @@ WFI_Release:            B4   WFI_Release        ; Wait for Input release
 ; =========================================================================================
 ; Print - Read characters from a string and write to video until a null is read.
 ;
-; Note: Video should be off when calling this function.
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ;
 ; Parameters:
 ; RF    - pointer to String
@@ -891,7 +932,7 @@ WFI_Release:            B4   WFI_Release        ; Wait for Input release
 
 Print:                  LDN  RF        ; get character, exit if 0 (null)
                         PLO  RC
-                        BZ   P_Exit
+                        BZ   W_Exit
                         INC  RF
 
                         PUSH RF        ; Save RF on stack
@@ -902,13 +943,15 @@ Print:                  LDN  RF        ; get character, exit if 0 (null)
                         
                         BR Print       ; continue with next character until null                        
 
-P_Exit:                 RETURN
+W_Exit:                 RETURN
 ;------------------------------------------------------------------------------------------
 
 ; =========================================================================================
 ; Println - Read characters from a string and write to video, then write a
 ;        new line character.
 ;
+; Note: Unsafe - this function does not save and restore registers used
+; 
 ; Parameters:
 ; RF    - pointer to String
 ;
@@ -928,6 +971,8 @@ Println:          CALL Print        ; Write string to video buffer
                       
 ; =========================================================================================
 ; GetMarkerPointer - Get a pointer to the Video Marker string "Pixie"
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ;
 ; Parameters:
 ;
@@ -949,6 +994,8 @@ GetMarkerPointer:       LOAD R9, O_VIDEO
 ; =========================================================================================
 ; ValidateVideo - Verify the Video Marker string matches "Pixie"
 ;
+; Note: Safe - This function saves and restores registers used by video routines
+;
 ; Parameters:
 ;                
 ; Internal:                        
@@ -961,12 +1008,14 @@ GetMarkerPointer:       LOAD R9, O_VIDEO
 ValidateVideo:          CALL GetMarkerPointer   ; Load RD with location of string
                         LOAD RF, VideoMarker    ; Load expected value in RF
                         CALL f_strcmp           ; Compare strings RD to RF
-                        PLO  RF                 ; Store result in RF.0
+                        PLO  RF                 ; Store result in RF.0                        
                         RETURN                  
 ;------------------------------------------------------------------------------------------
 
 ; =========================================================================================
 ; SetVideoMarker -  Set the Video Marker string "Pixie" at end of the video buffers
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ;
 ; Parameters:
 ;                
@@ -986,6 +1035,8 @@ SetVideoMarker:         CALL GetMarkerPointer   ; Load RD with location of strin
 ; =========================================================================================
 ; AllocateVideoBuffers - Set the Video Buffers and code into HiMem
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
 ; Parameters:
 ;                
 ; Internal:                        
@@ -1001,8 +1052,8 @@ AllocateVideoBuffers:   LOAD RF, O_HIMEM        ; point RF to available HiMem
                         LDA  RF                 ; retrieve HiMem location into RD
                         PHI  RD
                         LDA  RF          
-                        SMI  12H                ; subtract 18 for buffers
-                        GHI  RD                 ; borrow is set if less than 35 bytes available
+                        SMI  24H                ; subtract 36 for buffers
+                        GHI  RD                 ; borrow is set if less than 36 bytes available
                         SMBI 02                 ; subtract two pages with borrow
                         PHI  RD  
                         LDI  00H                ; set RD at page boundary
@@ -1045,6 +1096,8 @@ AllocateVideoBuffers:   LOAD RF, O_HIMEM        ; point RF to available HiMem
 ; =========================================================================================
 ; GetVideoFlag - Get the Video Flag from the buffers
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
 ; Parameters:
 ;                
 ; Internal:                        
@@ -1054,56 +1107,73 @@ AllocateVideoBuffers:   LOAD RF, O_HIMEM        ; point RF to available HiMem
 ; RF.0          Value of video flag
 ; =========================================================================================
                         
-GetVideoFlag:           CALL GetVideoFlagPointer    ; set pointer to video flag
-                        LDN  RD                ; get video flag 
-                        PLO  RF
-                      
+GetVideoFlag:           CALL GetVideoFlagPointer  ; set pointer to video flag
+                        LDN  RD                   ; get video flag 
+                        PLO  RF                      
                         RETURN                       
 ;------------------------------------------------------------------------------------------
 
 ; =========================================================================================
-; SaveVideoRegs - Save all registers affected by video routines
+; SaveVideoRegs - Save all registers affected by video routines into the video buffer
+;
+; Note: Safe - This function can be used to save video registers before calling unsafe
+;       video routines.
 ;
 ; Parameters:
-; R9, RA, RB, RC, RD, RF, D and DF are saved on the stack 
+; R9, RA, RB, RC, RD and RF are saved in the video buffer 
 ; Internal:
-;
+;  R8 is used as a stack pointer into the video buffer
 ; Returns:
 ;
 ; =========================================================================================
-SaveVideoRegs:          STXD                ; Save D on stack
-                        SHRC                ; Shift DF into D
-                        STXD                ; save DF on stack
-                        PUSH  R9
-                        PUSH  RA
-                        PUSH  RB
-                        PUSH  RC
-                        PUSH  RD
-                        PUSH  RF
+SaveVideoRegs:          PUSH R8          
+                        LOAD R8, O_VIDEO  ; get Video Display Page address
+                        LDN  R8           
+                        ADI  02H          ; Video buffers 2 pages after display 
+                        PHI  R8
+                        LDI  24H          ; point to top of stack
+                        PLO  R8
+                        SEX  R8           ; set x to video buffer stack pointer              
+                        PUSH R9           ; Save video registers on stack
+                        PUSH RA
+                        PUSH RB
+                        PUSH RC
+                        PUSH RD
+                        PUSH RF
+                        SEX  R2           ; Set X back to program Stack
+                        POP  R8           ; restore R8 to original values           
                         RETURN
 ;------------------------------------------------------------------------------------------
 
 ; =========================================================================================
-; RetoreVideoRegs - Restore all registers affected by video routines
+; RetoreVideoRegs - Restore all registers affected by video routines from the video buffer
+;
+; Note: Safe - This function can be used to restore video registers before calling unsafe
+;       video routines.
 ;
 ; Parameters:
-; 
+;  
 ; Internal:
-; 
+;  R8 is used as a stack pointer into the video buffer
 ; Returns:
-; R9, RA, RB, RC, RD, RF, D and DF with values retrieved from the stack
+; R9, RA, RB, RC, RD and RF with values retrieved from the video buffer stack
 ; =========================================================================================
-RestoreVideoRegs:       POP  RF
+RestoreVideoRegs:       PUSH R8           ; save R8 on program stack
+                        LOAD R8, O_VIDEO  ; get Video Display Page
+                        LDN  R8
+                        ADI  02H          ; Video buffers 2 pages after display
+                        PHI  R8
+                        LDI  18H          ; point to bottom of stack
+                        PLO  R8
+                        SEX  R8           ; set x to video buffer stack pointer
+                        POP  RF
                         POP  RD
                         POP  RC
                         POP  RB
                         POP  RA
                         POP  R9
-                        IRX
-                        LDX           ; Get DF from stack
-                        SHL           ; put hi bit into DF
-                        IRX           ; Get D from stack
-                        LDX           ; Restore D                        
+                        SEX  R2           ; set x back to program stack pointer
+                        POP  R8           ; restore R8
                         RETURN
 ;------------------------------------------------------------------------------------------
 
@@ -1111,6 +1181,7 @@ RestoreVideoRegs:       POP  RF
 ; UpdateVideo - Turn pixie video interrupts and DMA requests on, wait for an update 
 ;               and then turn them off.
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ; Note: This function is used to update video display
 ; 
 ; Internal:
@@ -1154,39 +1225,10 @@ VU_New_EF1:             BN1  VU_New_EF1         ; wait for frame end
 ;------------------------------------------------------------------------------------------                      
 
 ; =========================================================================================
-; WaitForDisplay - Wait several frames for video display to update 
-;
-; Parameters:
-; 
-; Internal:
-; RD - Pointer to VideoFlag
-; RF - Counter for display updates
-; Returns:
-;
-; =========================================================================================
-
-; WaitForDisplay:         CALL GetVideoFlagPointer    ; set pointer to video flag
-;                        LDN  RD                ; check video flag so we don't wait forever
-;                        BZ   WFD_Exit          ; for an EF1 signal that never occurs.
-                    
-                    
-;                        LOAD RF, 08H           ; Load count into RF 
-                                  
-; WFD_Check_DMA:          B1   WFD_Check_DMA     ; wait for first EF1 siginal (frame start)
-
-; WFD_New_EF1:            BN1  WFD_New_EF1       ; wait for next EF1 signal to start count
-                                               
-;                        DEC  RF
-;                        GLO  RF
-;                        BNZ  WFD_Check_DMA     ; keep counting down
-                        
-; WFD_Exit:               RETURN
-;------------------------------------------------------------------------------------------                          
-
-; =========================================================================================
 ; SetNewLineFlag - Set the newline flag 
 ;
-; Note: *Internal* - Set by the CheckNewLine function
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+; Note: Internal function used by the CheckForNewLine function
 ;
 ; Parameters:
 ; RC.0          Character Value to use to set new line flag:
@@ -1212,10 +1254,11 @@ SNLF_Save:              STR  RD                 ; store the flag
 ;------------------------------------------------------------------------------------------
 
 ; =========================================================================================
-; CheckNewLine -  Check the newline flag and ignore the CR or LF if part of two 
+; CheckForNewLine -  Check the newline flag and ignore the CR or LF if part of two 
 ;                 character new line sequence, CRLF or LFCR. 
 ;
-; Note: *Internal* - Called by write function
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+; Note: Internal function called by PutChar function
 ;
 ; Parameters:
 ; RC.0          Character value to check
@@ -1243,6 +1286,8 @@ CNL_Done:             CALL SetNewLineFlag   ; set flag based on next character
 ; =========================================================================================
 ; GetNewLinePointer - Get a pointer to the NewLine buffer
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
 ; Parameters:
 ;
 ; Internal:
@@ -1263,6 +1308,8 @@ GetNewLInePointer:      LOAD R9, O_VIDEO
 ; =========================================================================================
 ; GetNewLineFlag - Get the NewLine Flag from the buffers
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
 ; Parameters:
 ;                
 ; Internal:                        
@@ -1280,30 +1327,9 @@ GetNewLineFlag:         CALL GetNewlinePointer    ; set pointer to video flag
 ;------------------------------------------------------------------------------------------
 
 ; =========================================================================================
-; IsVideoReady - Check that the video is loaded and started.
-;
-; Parameters:
-;                
-; Internal:                        
-; RF           Video Valid and Video Started flag values
-;
-; Returns: 
-; RF.0          Ready value (0 if not ready; non-zero if ready)
-; =========================================================================================
-IsVideoReady:         CALL ValidateVideo
-                      GLO  RF
-                      BZ  IVR_loaded
-                      LDI 00H               ; load false value in RF.0           
-                      PLO RF
-                      RETURN 
-IVR_loaded:           CALL GetVideoFlag     ; sets RF true if started, false if not 
-                      RETURN
-;------------------------------------------------------------------------------------------
-
-; =========================================================================================
 ; EchoChar- Write character to serial out and display
 ;
-; Safe: All registers saved on stack and restored
+; Safe - This function saves and restores registers
 ;
 ; Parameters:
 ; RF            Pointer to string               
@@ -1333,7 +1359,7 @@ EchoChar:           PLO  RE                 ; save D in RE.0
                     SHL                     ; put hi bit into DF
                     LDX                     ; restore D
                     
-                    CALL F_TYPE             ; call orignal character routine
+                    CALL F_TYPE             ; call original character routine
                     
                     CALL SaveVideoRegs      ; save state after Bios call
                     CALL GetVideoFlag       ; check the video flag
@@ -1351,7 +1377,7 @@ EC_Off:             CALL RestoreVideoRegs   ; restore state after Bios call
 ; =========================================================================================
 ; EchoMsg - Write string to serial out and display
 ;
-; Safe: All registers saved on stack and restored
+; Safe - This function saves and restores registers
 ;
 ; Parameters:
 ; RF            Pointer to string               
@@ -1390,7 +1416,7 @@ EM_Off:             CALL RestoreVideoRegs   ; restore state after Bios call
 ; =========================================================================================
 ; EchoInMsg - Write inlined string to serial out and display
 ;
-; Safe: All registers saved on stack and restored
+; Safe - This function saves and restores registers
 ;
 ; Parameters:
 ; R6            Pointer to string inline with original call           
@@ -1432,6 +1458,8 @@ EIM_Skip:           LDA  R6                 ; move R6 past inline string
 ; =========================================================================================
 ; GetEndMarker - Get a pointer to last non-null character in marker string
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
 ; Parameters:
 ;
 ; Internal:
@@ -1452,6 +1480,8 @@ GetEndMarker:           LOAD R9, O_VIDEO
 ; =========================================================================================
 ; CheckVideoPage - Check to see if Video page can be safely unloaded.  The kernel HiMem 
 ;                  value must be one byte below Video page to be safe to unload.
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ;
 ; Parameters:
 ;                
@@ -1480,6 +1510,8 @@ CheckVideoPage:         LOAD R9, O_VIDEO        ; get the video page
 ; =========================================================================================
 ; UnloadVideo - Check to see if Video page can be unloaded
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
 ; Parameters:
 ;                
 ; Internal:                        
@@ -1503,6 +1535,8 @@ ULV_Done:               RETURN
 
 ; =========================================================================================
 ; Draw64x64Image - Copy a 64x64 bit image into the video buffer
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ;
 ; Parameters:
 ; RF            Pointer to 512 byte image data
@@ -1536,6 +1570,8 @@ D64_Loop2:                      LDA  RF							; Load second page of display
 ; =========================================================================================
 ; GetLoBytePointer - Get a pointer to the original lo Himem byte value
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
 ; Parameters:
 ;
 ; Internal:
@@ -1556,6 +1592,8 @@ GetLoBytePointer:       LOAD R9, O_VIDEO
 ; =========================================================================================
 ; SetLoByteValue - Set the lo byte value
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
 ; Note: Internal function used to save the original lo Himem byte value
 ;
 ; Parameters:
@@ -1573,6 +1611,7 @@ SetLoByteValue:         CALL GetLoBytePointer
 ; =========================================================================================
 ; GetLoByteValue - Get the lo byte value
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ; Note: Internal function used to restore the original lo Himem byte value
 ;
 ; Parameters:
@@ -1591,6 +1630,8 @@ GetLoByteValue:         CALL GetLoBytePointer
 
 ; =========================================================================================
 ; ClearVideoMarker -  Remove the Video Marker string "Pixie" at end of the buffers
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ;
 ; Parameters:
 ;                
@@ -1615,6 +1656,8 @@ ClearVideoMarker:       CALL GetEndMarker     ; Load RD last non-null character 
 
 ; =========================================================================================
 ; RestoreHiMem -  Restore the kernel HiMem value back to it's original value
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ;
 ; Parameters:
 ;                
@@ -1644,6 +1687,8 @@ RestoreHiMem:           CALL GetLoByteValue       ; get the original low byte
 ; =========================================================================================
 ; GetScratchPointer - Get a pointer to the scratch area in video buffers
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
 ; Parameters:
 ;
 ; Internal:
@@ -1663,6 +1708,8 @@ GetScratchPointer:      LOAD R9, O_VIDEO
                         
 ; =========================================================================================
 ; SetStrRefValue - Set the string reference value in the sratch area
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ;
 ; Note: Internal function used to save string reference for echo routines
 ;
@@ -1684,6 +1731,8 @@ SetStrRefValue:         CALL GetScratchPointer
 ; =========================================================================================
 ; GetStrRefValue - Get the string reference value from the scratch area
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
 ; Note: Internal function used to get original string reference for echo routines
 ;
 ; Parameters:
@@ -1704,6 +1753,7 @@ GetStrRefValue:         CALL GetScratchPointer
 ; =========================================================================================
 ; SetCharValue - Save a character value in the scratch buffer area
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ; Note: Internal function used to save the original character value for echo routines
 ;
 ; Parameters:
@@ -1720,6 +1770,8 @@ SetCharValue:           CALL GetScratchPointer
 
 ; =========================================================================================
 ; GetCharValue - Get the character value from the scratch area
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ;
 ; Note: Internal function used to get original character value for echo routines
 ;
@@ -1739,6 +1791,8 @@ GetCharValue:           CALL GetScratchPointer
 
 ; =========================================================================================
 ; GetEchoPointer - Get a pointer to the Echo vectors in the video buffer
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ;
 ; Parameters:
 ;
@@ -1760,6 +1814,8 @@ GetEchoPointer:         LOAD R9, O_VIDEO
 ; =========================================================================================
 ; GetEchoFlagPointer - Get a pointer to the Echo vectors in the video buffer
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
 ; Parameters:
 ;
 ; Internal:
@@ -1780,6 +1836,7 @@ GetEchoFlagPointer:     LOAD R9, O_VIDEO
 ; =========================================================================================
 ; SetEchoFlag - Set the echo flag to false or true
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ; Note: Internal function to set or clear the echo flag
 ;
 ; Parameters:
@@ -1795,25 +1852,34 @@ SetEchoFlag:            CALL GetEchoFlagPointer
 ;------------------------------------------------------------------------------------------
 
 ; =========================================================================================
-; GetEchooFlag - Get the Echo Flag from the video buffers
+; IsEchoOn - Get the Echo Flag from the video buffers
+;
+; Note: Safe - This function saves and restores registers used by video routines
 ;
 ; Parameters:
 ;                
-; Internal:                        
+; Internal:
+; R9            Pointer to video buffer page                        
 ; RD            Pointer to Echo Flag location
 ;
 ; Returns: 
-; RF.0          Value of Echo flag
+; RF.0          Value of Echo flag (non-zero if true, zero if false)
 ; =========================================================================================
                         
-GetEchoFlag:            CALL GetEchoFlagPointer   ; set pointer to video flag
+IsEchoOn:               PUSH R9
+                        PUSH RD
+                        CALL GetEchoFlagPointer   ; set pointer to video flag
                         LDN  RD                   ; get video flag 
-                        PLO  RF                      
+                        PLO  RF
+                        POP  RD
+                        POP  R9                      
                         RETURN                       
 ;------------------------------------------------------------------------------------------
 
 ;=========================================================================================
 ; SaveVector - Save kernel vector into the video echo buffer location
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ;
 ; Parameters:
 ;
@@ -1836,6 +1902,8 @@ SaveVector:             INC   RF            ; point to address
 ;=========================================================================================
 ; RestoreVector - Save kernel vector into the video echo buffer location
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
 ; Parameters:
 ;
 ; Internal:
@@ -1856,6 +1924,8 @@ RestoreVector:          INC   RF            ; point to address
 ;=========================================================================================
 ; MapVectors - Set kernel vectors to video echo routines
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
 ; Parameters:
 ;
 ; Internal:
@@ -1863,32 +1933,34 @@ RestoreVector:          INC   RF            ; point to address
 ; Returns:
 ; 
 ; =========================================================================================
-MapVectors:             LOAD RF, O_TYPE     ; point to kenel address
+MapVectors:             LOAD RF, O_TYPE     ; point to kernel address
                         INC  RF             ; point to address
                         LDI  hi(EchoChar)
                         STR  RF             ; save hi byte in kernel
-                        INC   RF            ; move to lo byte address
+                        INC  RF             ; move to lo byte address
                         LDI  lo(EchoChar)   ; get original lo byte value from echo buffer
-                        STR   RF            ; save lo byte in kernel
+                        STR  RF             ; save lo byte in kernel
                         LOAD RF, O_MSG      ; point to kenel address
                         INC  RF             ; point to address
                         LDI  hi(EchoMsg)
                         STR  RF             ; save hi byte in kernel
-                        INC   RF            ; move to lo byte address
+                        INC  RF             ; move to lo byte address
                         LDI  lo(EchoMsg)    ; get original lo byte value from echo buffer
-                        STR   RF            ; save lo byte in kernel      
+                        STR  RF             ; save lo byte in kernel      
                         LOAD RF, O_INMSG    ; point to kenel address
                         INC  RF             ; point to address
                         LDI  hi(EchoInMsg)
                         STR  RF             ; save hi byte in kernel
-                        INC   RF            ; move to lo byte address
+                        INC  RF             ; move to lo byte address
                         LDI  lo(EchoInMsg)  ; get original lo byte value from echo buffer
-                        STR   RF            ; save lo byte in kernel      
+                        STR  RF             ; save lo byte in kernel      
                         RETURN  
 ;------------------------------------------------------------------------------------------
                        
 ;=========================================================================================
 ; EchoOn - Save kernel vectors to echo vectors and map to video functions
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ;
 ; Parameters:
 ;
@@ -1916,6 +1988,8 @@ EchoOn:                 CALL GetEchoPointer   ; Point RD to Echo buffers
 ;=========================================================================================
 ; EchoOff - Restore kernel vectors from the echo vector locations in video buffer
 ;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
 ; Parameters:
 ;
 ; Internal:
@@ -1934,11 +2008,13 @@ EchoOff:                CALL GetEchoPointer   ; Point RD to Echo buffers
                         CALL RestoreVector    ; Save Kernel vector
                         LDI  00H              ; Set the Echo flag false
                         PLO  RF
-                        CALL SetEchoFlag    
+                        CALL SetEchoFlag
                         RETURN 
 ;------------------------------------------------------------------------------------------
 ; =========================================================================================
 ; Draw32x64Image - Copy a 32x64 bit image into the video buffer
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ;
 ; Parameters:
 ; RF            Pointer to 256 byte image data
@@ -1950,7 +2026,6 @@ EchoOff:                CALL GetEchoPointer   ; Point RD to Echo buffers
 ; RC            Counter for bytes (8 bytes per line)
 ; RD            Pointer to duplicate line image data
 ; =========================================================================================
-
 
 Draw32x64Image:     LOAD R9, O_VIDEO    ; prepare the pointer to the video buffer
                     LDN  R9
@@ -1981,6 +2056,77 @@ D32_loop2:          LDA  RD             ; repeat line of 8 bytes
                     GLO  RB
                     BNZ  D32_rpt
                     RETURN
+;------------------------------------------------------------------------------------------
+
+; =========================================================================================
+; IsVideoReady - Check that the video is loaded and started.
+;
+; Note: Safe - This function saves and restores registers used by video routines
+;
+; Parameters:
+;                
+; Internal:                        
+; RF     Video Valid and Video Started flag values
+; RD     Pointer to Video Flag location
+; R9     Pointer to video buffer page (GetVideoFlag)
+;
+; Returns: 
+; RF.0          Ready value (0 if not ready; non-zero if ready)
+; =========================================================================================
+IsVideoReady:         PUSH R9
+                      PUSH RD                      
+                      CALL ValidateVideo
+                      GLO  RF
+                      BZ  IVR_loaded
+                      LDI 00H               ; load false value in RF.0           
+                      PLO RF
+                      BR IVR_done           ; no need to check flag if not loaded
+IVR_loaded:           CALL GetVideoFlag     ; sets RF true if started, false if not 
+IVR_done:             POP RD                ; restore registers used to get video flag
+                      POP R9
+                      RETURN
+;------------------------------------------------------------------------------------------
+
+; =========================================================================================
+; DrawPixel - Set a pixel in the video buffer
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
+; Parameters:
+; RA.0          X coordinate of the character, 0 to 63
+; RA.1          Y coordinate of the character, 0 to 63
+;
+; Internal:
+; RF            Pointer to video buffer at X,Y byte Offset
+; RD.0          Bit mask
+; RC.1          X Offset byte value
+; RC.0          X Offset bit value
+; R9            Pointer to video buffer page
+; Return:
+; RF            
+; Internal:
+; R9            Pointer to buffer page value
+; =========================================================================================
+DrawPixel:
+                        CALL VideoOffsetY       ; set pointer to video at y location
+                        CALL VideoOffsetX       ; set pointer to video at x,y location
+                        LDI  80H                ; 0 offset is at left most bit
+                        PLO  RD                 ; set mask with zero bit set
+DP_Mask:                GLO  RC                 ; Get bit count  
+                        BZ   DP_SetBit          ; Count is done
+                        GLO  RD                 ; Get mask
+                        SHR                     ; Shift bit over one position
+                        PLO  RD                 ; store mask in RD.0
+                        DEC  RC                 ; Count down
+                        BR   DP_Mask            ; Check count and continue
+DP_SetBit:              LDN  RF                 ; Get the current value in the buffer
+                        STXD                    ; save it in memory
+                        IRX         
+                        GLO  RD                 ; Get the mask
+                        OR                      ; Or the mask with memory
+                        STR  RF                 ; Store it back in the video buffer
+                        RETURN
+;------------------------------------------------------------------------------------------
 
 ; ******************************* VIDEO BUFFER MEMORY MAP *********************************
 
@@ -2009,7 +2155,10 @@ D32_loop2:          LDA  RD             ; repeat line of 8 bytes
 ; =========================================================================================
 ; page+2:12 : Echo Flag 
 ; =========================================================================================
-; page+3:13-18 : 6 Bytes for "Pixie",0 string to verify video buffers are loaded
+; page+2:13-18 : 6 Bytes for "Pixie",0 string to verify video buffers are loaded
 ; =========================================================================================
+; page+2:19-24 : Stack for Save/Restore Video Registers (R9, RA, RB, RC, RD and RF)  
+; =========================================================================================
+
 
 VideoMarker:            db "Pixie",0

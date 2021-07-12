@@ -20,20 +20,15 @@ DisplayInt:                     NOP               ; 3 instruction cycles for NOP
                                 DEC  R2
                                 SAV               ; Save X,P on stack
                                 DEC  R2
-                                STR  R2
+                                STR  R2           ; Save D on stack
                                 ; LDI  hi(DisplayBuffer)
                                 LOAD R0, O_VIDEO  ; 8 instruction cycles in MACRO
-                                LDA  R0
-
-                                
+                                LDA  R0                                
                                 PHI  R0
                                 LDI  00H
-                                PLO  R0
+                                PLO  R0           ; 27 instruction cycles at this point
                                     
-                                ; NOP
-                                ; NOP
-                                ; SEX  R2
-INT_Loop:                       GLO  R0
+INT_Loop:                       GLO  R0           ; 2 instruction cycles
                                                   ; ------ DMA here ------
                                 SEX  R2
                                 DEC  R0
