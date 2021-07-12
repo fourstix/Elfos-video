@@ -38,6 +38,12 @@ Examples
     <td>Happy Dog 64x64 bit graphics demo</td>
   </tr>
   <tr align="center">
+   <td colspan="2"><img src="https://github.com/fourstix/Elfos-video/blob/main/pics/PixelDemo.jpg"></td>
+  </tr>
+  <tr align="center">
+   <td colspan="2">Pixel Graphics Demo.</td>
+  </tr>
+  <tr align="center">
    <td colspan="2"><img src="https://github.com/fourstix/Elfos-video/blob/main/pics/Config.jpg"></td>
   </tr>
   <tr align="center">
