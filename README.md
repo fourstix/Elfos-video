@@ -94,6 +94,9 @@ until a *vstop* command is issued.
 **StringTest**
 * Demo program to print various strings to the display.
 
+**PixelDemo**
+* Demo program to draw pixel graphics on the display.
+
 Video API
 ---------
 **ValidateVideo** - Validate video buffers are loaded into high memory
@@ -159,7 +162,7 @@ Video API
 
 **RestoreVideoRegs** -- Restore all registers affected by video routines from the video buffer
 * Restore the R9, RA, RB, RC, RD and RF registers with values retrieved from the video buffer.
-* Safe - This function can be used to restore video registers before calling video routines.
+* Safe - This function can be used to restore video registers after calling video routines.
 
 Video API Notes
 ---------------
@@ -173,13 +176,11 @@ Video API Notes
 
 * The UnloadVideo can be used to return video buffer memory to the system.
 
-* The Video functions IsVidoeReady and IsEchoOn check save and restore registers used and are 
-  safe. The other video functions do not preserve register values and are unsafe.
+* The IsVideoReady and IsEchoOn functions save and restore registers that they use and are 
+  safe. The other video functions do not preserve register values.
 
-* The  SaveVideoRegs and RestoreVideoRegs functions can be used to make video functions safe
-  by saving affected registers in the video buffer before any calls to video routines, and then restoring them afterwards.
-
-
+* The SaveVideoRegs and RestoreVideoRegs functions can be used to make video functions safe
+  by saving all registers used by video routines into the video buffer before any calls are made to video routines, and then restoring them afterwards.
  
 Repository Contents
 -------------------
