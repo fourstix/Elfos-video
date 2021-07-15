@@ -255,7 +255,7 @@ Repository Contents
   in the code will use the addresses in video.inc to locate the routines, setting the VideoCode constant
   to MEM will locate the routines in the Elf/OS user memory.  The echo command relies on the routines
   remaining available while the Elf/OS is running, so it requires the routines to be located in ROM.
-  * **/src/bas/** -- Example files compiled with the Basic/02 compiler using Elf-video API routines located in ROM.
+  * **/src/bas/** -- Example programs for the Basic/02 compiler using Elf-video API routines located in ROM.
     * **DrawStars.bas** - Basic/02 16-bit program that uses the Elfos-video API in ROM to draw random dots on the display. Use the DrawStars.bat batch file to compile the program.
     * **DrawSine.bas** - Basic/02 32-bit program that uses the Elfos-video API in ROM to draw a sine wave on the display. Use the DrawSine.bat batch file to compile the program.
     * **DrawStars.bas** - Basic/02 32-bit program that uses the Elfos-video API in ROM to draw a circle on the display.  Use the DrawCircle.bat batch file to compile the program.    
@@ -379,6 +379,134 @@ STG v1.10 + Video ROM Memory Map
   </tr>     
 </table>
 
+Elfos-Video API ROM Memory Map
+------------------------------
+These values are defined in the video.inc include file.
+<table class="table table-hover table-striped table-bordered">
+  <tr align="center">
+    <th>API Name</th>
+    <th>Address</th>
+    <th colspan="2">Description</th>  
+  </tr>
+  <tr align="center">
+    <td colspan="4">Safe - These Video API Routines save and restore registers used.
+    </td>
+  </tr>
+  <tr align="center">
+    <td>IsVideoReady</td>
+    <td>A545H</td>
+    <td colspan="2">Check that the video driver is loaded and started.</td> 
+  </tr>       
+  <tr align="center">
+    <td>IsEchoOn</td>
+    <td>A475H</td>
+    <td colspan="2">Get the Echo Flag from the video buffers.</td> 
+  </tr>
+  <tr align="center">
+    <td>SaveVideoRegs</td>
+    <td>A218H</td> 
+    <td colspan="2">Save all registers affected by video routines into the video buffer.</td>
+  </tr>       
+  <tr align="center">
+    <td>RestoreVideoRegs</td>
+    <td>A249H</td>
+    <td colspan="2">Restore all registers affected by video routines from the video buffer.</td>
+  </tr>
+  <tr align="center">       
+    <td colspan="2">Unsafe - These Video API Routines do *NOT* save and restore registers used.  The SaveVideoRegs and RestoreVideoRegs routines can be used to call them safely.
+    </td>
+  </tr>       
+  <tr align="center">
+    <td>AllocateVideoBuffers</td>
+    <td>A1CCH</td>
+    <td colspan="2">This routine should be called first to set up the Video Buffers in HiMem.</td> 
+  </tr>
+  <tr align="center">
+    <td>ValidateVideo</td>
+    <td>A1B1H</td> 
+    <td colspan="2">Verify the Video Buffer is loaded into HiMem.</td>
+  </tr>
+  <tr align="center">
+    <td>VideoOn</td>
+    <td>9FF5H</td> 
+    <td colspan="2">Initialize the Video Buffer to turn on video.</td>
+  </tr>
+  <tr align="center">
+    <td>VideoOff</td>
+    <td>A00BH</td> 
+    <td colspan="2">Turn the video off and clear the Video Buffer variables.</td>
+  </tr>
+  <tr align="center">
+    <td>UnloadVideo</td>
+    <td>A3BFH</td> 
+    <td colspan="2">Return the Video Buffer memory to the system.</td>
+  </tr>
+  <tr align="center">
+    <td>UpdateVideo</td>
+    <td>A280H</td> 
+    <td colspan="2"Display the Video Buffer after a change.</td>
+  </tr>
+  <tr align="center">
+    <td>ClearScreen</td>
+    <td>A0C9H</td> 
+    <td colspan="2"Blank the Video Buffer and home the cursor.</td>
+  </tr>
+  <tr align="center">
+    <td>PutChar</td>
+    <td>9FC7H</td> 
+    <td colspan="2"Write a character to the Video Buffer and advance the cursor.</td>
+  </tr>
+  <tr align="center">
+    <td>Print</td>
+    <td>A185H</td> 
+    <td colspan="2">Read characters from a string and write them to the Video Buffer, advancing the cursor.</td>
+  </tr>
+  <tr align="center">
+    <td>Println</td>
+    <td>A199H</td> 
+    <td colspan="2">Read characters from a string and write them to the Video Buffer, advancing the cursor. Then write a new line character and move the cursor to the next line..</td>
+  </tr>
+  <tr align="center">
+    <td>EchoOn</td>
+    <td>A4C7H</td> 
+    <td colspan="2">Save kernel vectors in Video Buffer and map them to video display functions.</td>
+  </tr>    
+  <tr align="center">
+    <td>EchoOn</td>
+    <td>A4C7H</td> 
+    <td colspan="2">Save the character output kernel vectors in the Video Buffer and map them to echo display functions.</td>
+  </tr>
+  <tr align="center">
+    <td>EchoOff</td>
+    <td>A4EFH</td> 
+    <td colspan="2">Restore the character output kernel vectors from the Video Buffer.</td>
+  </tr>
+  <tr align="center">
+    <td>DrawString</td>
+    <td>9ECCH</td> 
+    <td colspan="2">Write a string into the video buffer at the specified display coordinates.</td>
+  </tr>
+  <tr align="center">
+    <td>Draw32x64Image</td>
+    <td>A514H</td> 
+    <td colspan="2">Copy a 32x64 bit image (256 bytes) into the video buffer.</td>
+  </tr>
+  <tr align="center">
+    <td>Draw64x64Image</td>
+    <td>A3CFH</td> 
+    <td colspan="2">Copy a 64x64 bit image (512 bytes) into the video buffer.</td>
+  </tr>
+  <tr align="center">
+    <td>DrawSprite</td>
+    <td>9E61H</td> 
+    <td colspan="2">Copy an image into the video buffer at the specified display coordinates.</td>
+  </tr>
+  <tr align="center">
+    <td>DrawPixel</td>
+    <td>A566H</td> 
+    <td colspan="2">Set a single pixel in the video buffer at the specified display coordinates.</td>
+  </tr>                     
+</table>
 License Information
 -------------------
 

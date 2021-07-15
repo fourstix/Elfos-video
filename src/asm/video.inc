@@ -20,11 +20,11 @@ Print:                  EQU   0A185H
 Println:                EQU   0A199H
 EchoOn:                 EQU   0A4C7H
 EchoOff:                EQU   0A4EFH
-DrawString              EQU   09ECCH
+DrawString:             EQU   09ECCH
 Draw32x64Image:         EQU   0A514H
 Draw64x64Image:         EQU   0A3CFH
 DrawSprite:             EQU   09E61H
-DrawPixel               EQU   0A566H
+DrawPixel:              EQU   0A566H
 ; **************************************************************
 ; This defines the video page value location in the kernel 
 ; **************************************************************                    
