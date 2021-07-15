@@ -259,6 +259,10 @@ Repository Contents
   * video.hex - Hex file assembled for video source.
   * **/bin/video/mem/** -- Binary files assembled from the source files with the video routines located in memory.  These files can be loaded into the Elf/OS file system using the xr or xrb command.
   * **/bin/video/rom/** -- Binary files assembled from the source files with the video routines located in ROM.  These files can be loaded into the Elf/OS file system using the xr or xrb command.
+* **/bin/bas/** -- Binary files compiled with the Basic/02 compiler for Elf-video API routines located in ROM.
+  * **DrawStars.asm** - Basic/02 16-bit program that uses the Elfos-video API in ROM to draw random dots on the display. Use the DrawStars.bat batch file to compile the program.
+  * **DrawSine.asm** - Basic/02 32-bit program that uses the Elfos-video API in ROM to draw a sine wave on the display. Use the DrawSine.bat batch file to compile the program.
+  * **DrawStars.asm** - Basic/02 32-bit program that uses the Elfos-video API in ROM to draw a circle on the display.  Use the DrawCircle.bat batch file to compile the program.
 * **/bin/pev2_rom/**  -- Pico/Elf v2 Runtime ROM with video routines.  
   * runtime+video.hex - Hex file for Pico/Elf v2 Runtime with assembled video routines added at address 9D00H.
 * **/bin/stg_rom/**  -- Spare Time Gizmos v1.10 ROM with video routines.  
@@ -294,6 +298,9 @@ Repository Contents
   * rommerge.exe - Executable file for Windows 10.    
   * romtext.c - Tool generate ROM help information from a text file, such as help.new 
   * romtext.exe - Executable file for Windows 10.
+* **/utils/bas/**  -- Basic/02 compiler  used to compile the demo programs.  Please check the [rileym65/Basic-02](https://github.com/rileym65/Basic-02) repository for the latest version of Basic/02.
+  * sbc.exe - Windows 10 executable version of the Basic/02 compiler.
+  * sbc.doc - Basic/02 documentation.
 * **/pics/** -- Example pictures for the repository documentation 
 
 STG v1.10 + Video ROM Memory Map
