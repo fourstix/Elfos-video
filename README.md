@@ -254,15 +254,16 @@ Repository Contents
   for echo which works only with the video routines in ROM.  Setting the VideoCode constant to "ROM"
   in the code will use the addresses in video.inc to locate the routines, setting the VideoCode constant
   to MEM will locate the routines in the Elf/OS user memory.  The echo command relies on the routines
-  remaining available while the Elf/OS is running, so it requires the routines to be located in ROM.  
+  remaining available while the Elf/OS is running, so it requires the routines to be located in ROM.
+  * **/src/bas/** -- Example files compiled with the Basic/02 compiler using Elf-video API routines located in ROM.
+    * **DrawStars.bas** - Basic/02 16-bit program that uses the Elfos-video API in ROM to draw random dots on the display. Use the DrawStars.bat batch file to compile the program.
+    * **DrawSine.bas** - Basic/02 32-bit program that uses the Elfos-video API in ROM to draw a sine wave on the display. Use the DrawSine.bat batch file to compile the program.
+    * **DrawStars.bas** - Basic/02 32-bit program that uses the Elfos-video API in ROM to draw a circle on the display.  Use the DrawCircle.bat batch file to compile the program.    
 * **/bin/video/**  -- Assembled binary code from the source files.
   * video.hex - Hex file assembled for video source.
   * **/bin/video/mem/** -- Binary files assembled from the source files with the video routines located in memory.  These files can be loaded into the Elf/OS file system using the xr or xrb command.
   * **/bin/video/rom/** -- Binary files assembled from the source files with the video routines located in ROM.  These files can be loaded into the Elf/OS file system using the xr or xrb command.
 * **/bin/bas/** -- Binary files compiled with the Basic/02 compiler for Elf-video API routines located in ROM.
-  * **DrawStars.asm** - Basic/02 16-bit program that uses the Elfos-video API in ROM to draw random dots on the display. Use the DrawStars.bat batch file to compile the program.
-  * **DrawSine.asm** - Basic/02 32-bit program that uses the Elfos-video API in ROM to draw a sine wave on the display. Use the DrawSine.bat batch file to compile the program.
-  * **DrawStars.asm** - Basic/02 32-bit program that uses the Elfos-video API in ROM to draw a circle on the display.  Use the DrawCircle.bat batch file to compile the program.
 * **/bin/pev2_rom/**  -- Pico/Elf v2 Runtime ROM with video routines.  
   * runtime+video.hex - Hex file for Pico/Elf v2 Runtime with assembled video routines added at address 9D00H.
 * **/bin/stg_rom/**  -- Spare Time Gizmos v1.10 ROM with video routines.  
