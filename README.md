@@ -255,7 +255,7 @@ Repository Contents
   in the code will use the addresses in video.inc to locate the routines, setting the VideoCode constant
   to MEM will locate the routines in the Elf/OS user memory.  The echo command relies on the routines
   remaining available while the Elf/OS is running, so it requires the routines to be located in ROM.
-* **/src/bas/** -- Example programs for the Basic/02 compiler using Elf-video API routines located in ROM.
+* **/src/bas/** -- Example programs for the Basic/02 compiler using Elfos-video API routines located in ROM.
   * **DrawStars.bas** - Basic/02 16-bit program that uses the Elfos-video API in ROM to draw random dots on the display. Use the DrawStars.bat batch file to compile the program.
   * **DrawSine.bas** - Basic/02 32-bit program that uses the Elfos-video API in ROM to draw a sine wave on the display. Use the DrawSine.bat batch file to compile the program.
   * **DrawStars.bas** - Basic/02 32-bit program that uses the Elfos-video API in ROM to draw a circle on the display.  Use the DrawCircle.bat batch file to compile the program.    
@@ -263,7 +263,7 @@ Repository Contents
   * video.hex - Hex file assembled for video source.
   * **/bin/video/mem/** -- Binary files assembled from the source files with the video routines located in memory.  These files can be loaded into the Elf/OS file system using the xr or xrb command.
 * **/bin/video/rom/** -- Binary files assembled from the source files with the video routines located in ROM.  These files can be loaded into the Elf/OS file system using the xr or xrb command.
-* **/bin/bas/** -- Binary files compiled with the Basic/02 compiler for Elf-video API routines located in ROM.
+* **/bin/bas/** -- Binary files compiled with the Basic/02 compiler for Elfos-video API routines located in ROM.
 * **/bin/pev2_rom/**  -- Pico/Elf v2 Runtime ROM with video routines.  
   * runtime+video.hex - Hex file for Pico/Elf v2 Runtime with assembled video routines added at address 9D00H.
 * **/bin/stg_rom/**  -- Spare Time Gizmos v1.10 ROM with video routines.  
@@ -469,11 +469,6 @@ These values are defined in the video.inc include file.
   <tr align="center">
     <td>EchoOn</td>
     <td>A4C7H</td> 
-    <td colspan="2">Save kernel vectors in Video Buffer and map them to video display functions.</td>
-  </tr>    
-  <tr align="center">
-    <td>EchoOn</td>
-    <td>A4C7H</td> 
     <td colspan="2">Save the text output kernel vectors in the Video Buffer and map them to echo display functions.</td>
   </tr>
   <tr align="center">
@@ -538,7 +533,7 @@ Copyright (c) 2004-2021 by Mike Riley.
 Spare Time Gizmos Pico Elf EProm v1.10 
 Copyright (C) 2004-2021 by Spare Time Gizmos
 
-Basic/O2 Software
+Basic/02 Software
 Copyright (c) 2021 by Mike Riley.
  
 Many thanks to the original authors for making their designs and code available as open source.
