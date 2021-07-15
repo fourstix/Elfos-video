@@ -38,11 +38,21 @@ Examples
     <td>Happy Dog 64x64 bit graphics demo</td>
   </tr>
   <tr align="center">
-   <td colspan="2"><img src="https://github.com/fourstix/Elfos-video/blob/main/pics/PixelDemo.jpg"></td>
+   <td ><img src="https://github.com/fourstix/Elfos-video/blob/main/pics/PixelDemo.jpg"></td>
+   <td ><img src="https://github.com/fourstix/Elfos-video/blob/main/pics/BasicStars.jpg"></td>
   </tr>
   <tr align="center">
-   <td colspan="2">Pixel Graphics Demo.</td>
+   <td >Pixel Graphics Demo.</td>
+   <td >Basic/02 DrawStars Elfos-video Demo.</td>
   </tr>
+  <tr align="center">
+   <td ><img src="https://github.com/fourstix/Elfos-video/blob/main/pics/BasicSine.jpg"></td>
+   <td ><img src="https://github.com/fourstix/Elfos-video/blob/main/pics/BasicCircle.jpg"></td>
+  </tr>
+  <tr align="center">
+   <td >Basic/02 DrawSine Elfos-video Demo.</td>
+   <td >Basic/02 DrawCircle Elfos-video Demo.</td>
+  </tr>  
   <tr align="center">
    <td colspan="2"><img src="https://github.com/fourstix/Elfos-video/blob/main/pics/Config.jpg"></td>
   </tr>
@@ -187,7 +197,26 @@ Video API Notes
 
 * The SaveVideoRegs and RestoreVideoRegs functions can be used to make video functions safe
   by saving all registers used by video routines into the video buffer before any calls are made to video routines, and then restoring them afterwards.
- 
+
+Basic/02 Example Programs
+-------------------------
+The Basic/02 compiler written by Mike Riley supports blocks of 1802 Assembly code 
+through the asm statement.  The Basic/02 compiler is available on Github in the 
+[rileym65/Basic-02](https://github.com/rileym65/Basic-02) repository.
+
+These examples show how to call the Elfos-video routines from inside a Basic/02 program.
+DrawStars is an example of a 16-bit Basic/02 program using the Elfos-video routines to
+display a field of random dots.  DrawSine and DrawCircle are 32-bit programs using floating point functions to draw a sine wave and a circle on the video display using the Elfos-video drawpixel function.
+
+**DrawStars** 
+* Basic/02 demo program to draw a random set of dots on the display.
+  
+**DrawSine**
+* Basic/02 demo program to draw a sine wave on the display.
+
+**DrawCircle**
+* Basic/02 demo program to draw a circle on the display.
+
 Repository Contents
 -------------------
 * **/src/video/**  -- Assembly code source files for the Elf/OS Video functions.
@@ -201,7 +230,7 @@ Repository Contents
   * bios.inc - Include file for Elf/OS bios definitions from [rileym65/Elf-BIOS](https://github.com/rileym65/Elf-BIOS)
   * kernel.inc - Include file for Elf/OS kernel definitions from [rileym65/Elf-Elfos-Kernel](https://github.com/rileym65/Elf-Elfos-Kernel)
   These files are used to create the video.hex file used for the ROM images.
-* **/src/**  -- Video programs for the Elf/OS
+* **/src/asm/**  -- Video programs for the Elf/OS
   * **video.inc** - Include file for video ROM definitions.
   * **vstart.asm** - Start video by allocating video buffers in high memory and set flags. Use the vstart.bat batch file to assemble the vstart command
   * **vtest.asm** - Test video and show status. Use the vtest.bat batch file to assemble vtest command.
