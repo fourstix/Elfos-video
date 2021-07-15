@@ -209,13 +209,13 @@ DrawStars is an example of a 16-bit Basic/02 program using the Elfos-video routi
 display a field of random dots.  DrawSine and DrawCircle are 32-bit programs using floating point functions to draw a sine wave and a circle on the video display using the Elfos-video drawpixel function.
 
 **DrawStars** 
-* Basic/02 demo program to draw a random set of dots on the display.
+* Basic/02 16-bit program to draw a random set of dots on the display.
   
 **DrawSine**
-* Basic/02 demo program to draw a sine wave on the display.
+* Basic/02 32-bit program to draw a sine wave on the display.
 
 **DrawCircle**
-* Basic/02 demo program to draw a circle on the display.
+* Basic/02 32-bit program to draw a circle on the display.
 
 Repository Contents
 -------------------
@@ -255,7 +255,7 @@ Repository Contents
   in the code will use the addresses in video.inc to locate the routines, setting the VideoCode constant
   to MEM will locate the routines in the Elf/OS user memory.  The echo command relies on the routines
   remaining available while the Elf/OS is running, so it requires the routines to be located in ROM.
-  * **/src/bas/** -- Example programs for the Basic/02 compiler using Elf-video API routines located in ROM.
+* **/src/bas/** -- Example programs for the Basic/02 compiler using Elf-video API routines located in ROM.
     * **DrawStars.bas** - Basic/02 16-bit program that uses the Elfos-video API in ROM to draw random dots on the display. Use the DrawStars.bat batch file to compile the program.
     * **DrawSine.bas** - Basic/02 32-bit program that uses the Elfos-video API in ROM to draw a sine wave on the display. Use the DrawSine.bat batch file to compile the program.
     * **DrawStars.bas** - Basic/02 32-bit program that uses the Elfos-video API in ROM to draw a circle on the display.  Use the DrawCircle.bat batch file to compile the program.    
@@ -299,7 +299,7 @@ Repository Contents
   * rommerge.exe - Executable file for Windows 10.    
   * romtext.c - Tool generate ROM help information from a text file, such as help.new 
   * romtext.exe - Executable file for Windows 10.
-* **/utils/bas/**  -- Basic/02 compiler  used to compile the demo programs.  Please check the [rileym65/Basic-02](https://github.com/rileym65/Basic-02) repository for the latest version of Basic/02.
+* **/utils/bas/**  -- Basic/02 compiler  used to compile the demo programs.  Please check the [rileym65/Basic-02](https://github.com/rileym65/Basic-02) repository on GitHub for the latest version of Basic/02.
   * sbc.exe - Windows 10 executable version of the Basic/02 compiler.
   * sbc.doc - Basic/02 documentation.
 * **/pics/** -- Example pictures for the repository documentation 
@@ -413,7 +413,7 @@ These values are defined in the video.inc include file.
     <td colspan="2">Restore all registers affected by video routines from the video buffer.</td>
   </tr>
   <tr align="center">       
-    <td colspan="2">Unsafe - These Video API Routines do *NOT* save and restore registers used.  The SaveVideoRegs and RestoreVideoRegs routines can be used to call them safely.
+    <td colspan="4">Unsafe - These Video API Routines do *NOT* save and restore registers used.  The SaveVideoRegs and RestoreVideoRegs routines can be used to call them safely.
     </td>
   </tr>       
   <tr align="center">
@@ -444,17 +444,17 @@ These values are defined in the video.inc include file.
   <tr align="center">
     <td>UpdateVideo</td>
     <td>A280H</td> 
-    <td colspan="2"Display the Video Buffer after a change.</td>
+    <td colspan="2">Display the Video Buffer after a change.</td>
   </tr>
   <tr align="center">
     <td>ClearScreen</td>
     <td>A0C9H</td> 
-    <td colspan="2"Blank the Video Buffer and home the cursor.</td>
+    <td colspan="2">Blank the Video Buffer and home the cursor.</td>
   </tr>
   <tr align="center">
     <td>PutChar</td>
     <td>9FC7H</td> 
-    <td colspan="2"Write a character to the Video Buffer and advance the cursor.</td>
+    <td colspan="2">Write a character to the Video Buffer and advance the cursor.</td>
   </tr>
   <tr align="center">
     <td>Print</td>
@@ -474,12 +474,12 @@ These values are defined in the video.inc include file.
   <tr align="center">
     <td>EchoOn</td>
     <td>A4C7H</td> 
-    <td colspan="2">Save the character output kernel vectors in the Video Buffer and map them to echo display functions.</td>
+    <td colspan="2">Save the text output kernel vectors in the Video Buffer and map them to echo display functions.</td>
   </tr>
   <tr align="center">
     <td>EchoOff</td>
     <td>A4EFH</td> 
-    <td colspan="2">Restore the character output kernel vectors from the Video Buffer.</td>
+    <td colspan="2">Restore the text output kernel vectors from the Video Buffer.</td>
   </tr>
   <tr align="center">
     <td>DrawString</td>
@@ -507,6 +507,7 @@ These values are defined in the video.inc include file.
     <td colspan="2">Set a single pixel in the video buffer at the specified display coordinates.</td>
   </tr>                     
 </table>
+
 License Information
 -------------------
 
@@ -536,6 +537,9 @@ Copyright (c) 2004-2021 by Mike Riley.
 
 Spare Time Gizmos Pico Elf EProm v1.10 
 Copyright (C) 2004-2021 by Spare Time Gizmos
+
+Basic/O2 Software
+Copyright (c) 2021 by Mike Riley.
  
 Many thanks to the original authors for making their designs and code available as open source.
 Special thanks to Mike Riley and Bob Armstrong for their patience and help.
