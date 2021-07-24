@@ -58,44 +58,51 @@ VideoCode EQU "ROM"
 
 ; Build information
 binfo:              db      80H+7           ; Month, 80H offset means extended info
-                    db      11              ; Day
+                    db      23              ; Day
                     dw      2021            ; Year
 
 ; Current build number
-build:              dw      3
+build:              dw      4
 
                     ; Must end with 0 (null)
                     db      'Copyright 2021 Gaston Williams',0
             
 start:              CALL ValidateVideo          ; check if video is already loaded
-                    GLO  RF
-                    BNZ  allocate
-                    BR   loaded 
+                    GLO  RF                     ; RF.0 = zero, means already loaded
+                    BZ   loaded                 
             
-allocate:           CALL AllocateVideoBuffers   ; allocate video buffers in himem
-            
+                    CALL AllocateVideoBuffers   ; allocate video buffers in himem
+                    GLO  RF                     ; check the return flag
+                    BNZ  no_mem                 ; non-zero means Elf/OS alloc failed
+                     
                     CALL ValidateVideo          ; validate video drivers loaded okay
-                    GLO RF
-                    BZ verbose
-                    LOAD RF, failed
-                    CALL O_MSG 
-                    NOP
-                    LBR O_WRMBOOT 
-                    
-verbose:            LOAD RF, descript           ; show description and copyright
+                    GLO RF                      ; RF.0 is zero, if valid
+                    BNZ invalid                 ; drivers failed to load for some reason
+                                        
+                    LOAD RF, descript           ; show video driver description 
                     CALL O_MSG
-                    LOAD RF, notice  
+                    LOAD RF, k_version          ; show kernel version info
+                    CALL O_MSG
+                    LOAD RF, notice             ; show copyright notice
                     CALL O_MSG
                                         
 loaded:             CALL VideoOn                ; turn video on
                     LOAD RF, started  
                     CALL O_MSG              
                     LBR O_WRMBOOT               ; return to Elf/OS 
+
+no_mem:             LOAD RF, not_alloc          ; show no memory available error
+                    CALL O_MSG
+
+invalid:            LOAD RF, failed             ; show driver failed to load error
+                    CALL O_MSG 
+                    LBR O_WRMBOOT               ; return to Elf/OS
                     
-                                
+not_alloc:          db   "Elf/OS memory not allocated.",10,13,0                                
 failed:             db   "Video drivers failed to load.",10,13,0
 started:            db   "Video started.",10,13,0
-descript:           db   "Elf/OS 1861 Pixie Video Drivers v3.01",10,13,0
+descript:           db   "Elf/OS 1861 Pixie Video Drivers v4.01",10,13,0
+k_version:          db   "For Elf/OS Kernel version 0.4.0 and higher.",10,13,0
 notice:             db   "Copyright (c) 2021 by Gaston Williams",10,13,0
 ; ************************************************************
 ; Assemble video routines in memory

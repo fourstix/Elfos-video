@@ -64,10 +64,10 @@ VideoCode EQU "ROM"
 ; **************************************************
 
 binfo:				db	80h+7		; Month
-							db	11 			; Day
+							db	23 			; Day
 							dw	2021		; Year
 
-build:				dw	3	      ; build
+build:				dw	4	      ; build
 							db	'Copyright 2021 Gaston Williams',0
 
 ; =========================================================================================
