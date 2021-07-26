@@ -1,1 +1,1 @@
-sbc -l -c -fp -b -ram=0000-79FF -rom=8000-FFFF -elfos DrawCircle.bas
+sbc -l -c -fp -b -ram=0000-77FC -rom=8000-FFFF -elfos DrawCircle.bas
