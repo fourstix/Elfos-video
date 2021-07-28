@@ -1,4 +1,4 @@
-1.12# Elfos-video
+# Elfos-video
 Video functions for 1861 Pixie Video Display written for the 1802 Pico/Elf v2 microcomputer.
 
 This code provides support for a basic video functions on an 1861 Pixie Video display
