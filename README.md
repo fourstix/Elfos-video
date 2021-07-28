@@ -1,4 +1,4 @@
-# Elfos-video
+1.12# Elfos-video
 Video functions for 1861 Pixie Video Display written for the 1802 Pico/Elf v2 microcomputer.
 
 This code provides support for a basic video functions on an 1861 Pixie Video display
@@ -57,7 +57,7 @@ Examples
    <td colspan="2"><img src="https://github.com/fourstix/Elfos-video/blob/main/pics/Config.jpg"></td>
   </tr>
   <tr align="center">
-   <td colspan="2">Pico/Elf v2 with the STG v1.10 + Video EPROM and an STG RTC/NVR/UART card and a PicoElf Pixie Video GLCD card showing the output from the echo command.</td>
+   <td colspan="2">Pico/Elf v2 with the STG v1.12 + Video EPROM and an STG RTC/NVR/UART card and a PicoElf Pixie Video GLCD card showing the output from the echo command.</td>
   </tr>
 </table>
 
@@ -266,32 +266,32 @@ Repository Contents
 * **/bin/bas/** -- Binary files compiled with the Basic/02 compiler for Elfos-video API routines located in ROM.
 * **/bin/pev2_rom/**  -- Pico/Elf v2 Runtime ROM with video routines.  
   * runtime+video.hex - Hex file for Pico/Elf v2 Runtime with assembled video routines added at address 9D00H.
-* **/bin/stg_rom/**  -- Spare Time Gizmos v1.10 ROM with video routines.  
-  * StgVideo.hex - Hex file for Spare Time Gizmos v1.10 and assembled video routines added at address 9D00H.
+* **/bin/stg_rom/**  -- Spare Time Gizmos v1.12 ROM with video routines.  
+  * PicoElfSTG112Video.hex - Hex file for Spare Time Gizmos v1.12 and assembled video routines added at address 9D00H.
 * **/utils/pev2_rom/**  -- Utility files to create Pico/Elf v2 Runtime ROM with video routines. 
   * runtime.hex - [Hex file for Pico/Elf v2 Runtime](http://www.elf-emulation.com/software/picoelf/runtime.hex) from [Elf-Emulation](http://www.elf-emulation.com/software.html) website.    
-* **/utils/stg_rom/**  -- Utility files to create Spare Time Gizmos v1.10 ROM with video routines.  
+* **/utils/stg_rom/**  -- Utility files to create Spare Time Gizmos v1.12 ROM with video routines.  
   * help.new - Updated help text with Pixie Video test enabled.
-  * Make_Stg.bat - Batch files to run the STG ROM tools to create the STG v1.10 ROM with video routines.
+  * Make_Stg.bat - Batch files to run the STG ROM tools to create the STG v1.12 ROM with video routines.
   * readme.txt - Updated detailed information on how the ROM is created with video routines in place of the RC Forth code.
-  * readme_original.txt - Original detailed information on how the STG v1.10 ROM is created.
-* **/utils/stg_rom/boots/** -- Updated Boots monitor program to include video routines and pixie video test.  Based on source files from the [Elf2K and PicoElf EPROM v1.10 source files](https://groups.io/g/cosmacelf/files/STG%20Elf2K/Elf2K%20and%20PicoElf%20EPROM%20v107.zip) in the files section of the [CosmacElf group](https://groups.io/g/cosmacelf) on groups.io.  More information is available on the [Spare Time Gizmos](http://www.sparetimegizmos.com/Hardware/Elf2K.htm) website, especially in the [Cosmac ELf 2000 User's Manual](http://www.sparetimegizmos.com/Downloads/Elf2k.pdf).
+  * readme_original.txt - Original detailed information on how the STG v1.12 ROM is created.
+* **/utils/stg_rom/boots/** -- Updated Boots monitor program to include video routines and pixie video test.  Based on source files from the [Elf2K and PicoElf EPROM v1.12 source files](https://groups.io/g/cosmacelf/files/STG%20Elf2K/Elf2K%20and%20PicoElf%20EPROM%20v107.zip) in the files section of the [CosmacElf group](https://groups.io/g/cosmacelf) on groups.io.  More information is available on the [Spare Time Gizmos](http://www.sparetimegizmos.com/Hardware/Elf2K.htm) website, especially in the [Cosmac ELf 2000 User's Manual](http://www.sparetimegizmos.com/Downloads/Elf2k.pdf).
   * boots.asm - Updated Boots monitor source to include video routines.
   * boots.inc - Included file with definitions for Boots monitor.
   * config.inc - Included configuration definitions for a Pico/Elf v2 with Pixie Video.
   * hardware.inc - Included hardware definitions for a Pico/Elf v2 with Pixie Video.
   * bios.hex - Bios routines assembled from [rileym65/Elf-BIOS](https://github.com/rileym65/Elf-BIOS) 
   * make_boots.bat - Windows batch file to create boots.hex file
-* **/utils/stg_rom/hex/**  -- Original program hex files used to create the STG v1.10 rom
+* **/utils/stg_rom/hex/**  -- Original program hex files used to create the STG v1.12 rom
   * bios.hex - Bios routines assembled from [rileym65/Elf-BIOS](https://github.com/rileym65/Elf-BIOS)  
-  * boots.hex - Bootstrap and monitor program for the Pico/Elf v2 created from source files based on the [Elf2K and PicoElf EPROM v1.10 source files](https://groups.io/g/cosmacelf/files/STG%20Elf2K/Elf2K%20and%20PicoElf%20EPROM%20v107.zip) in the files section of the [CosmacElf group](https://groups.io/g/cosmacelf) on groups.io and modified as listed above.  More information is available on the [Spare Time Gizmos](http://www.sparetimegizmos.com/Hardware/Elf2K.htm) website, especially in the [Cosmac ELf 2000 User's Manual](http://www.sparetimegizmos.com/Downloads/Elf2k.pdf).
+  * boots.hex - Bootstrap and monitor program for the Pico/Elf v2 created from source files based on the [Elf2K and PicoElf EPROM v1.12 source files](https://groups.io/g/cosmacelf/files/STG%20Elf2K/Elf2K%20and%20PicoElf%20EPROM%20v107.zip) in the files section of the [CosmacElf group](https://groups.io/g/cosmacelf) on groups.io and modified as listed above.  More information is available on the [Spare Time Gizmos](http://www.sparetimegizmos.com/Hardware/Elf2K.htm) website, especially in the [Cosmac ELf 2000 User's Manual](http://www.sparetimegizmos.com/Downloads/Elf2k.pdf).
   * edtasm.hex - Edit/Asm program assembled from [rileym65/Elf-EDTASM](https://github.com/rileym65/Elf-EDTASM)
   * rcbasic.hex - BASIC program assembled from [rileym65/Elf-RcBasic](https://github.com/rileym65/Elf-RcBasic)
   * forth.hex - Forth program assembled from [rileym65/Elf-RcForth](https://github.com/rileym65/Elf-RcForth)
   * sedit.hex - Sedit program assembled from [rileym65/Elf-Elfos-sedit](https://github.com/rileym65/Elf-Elfos-sedit)
   * visual02.hex - Visual02 program assembled from [rileym65/Elf-Visual02](https://github.com/rileym65/Elf-Visual02)
   * xmodem.hex - XModem communication routines similar to those used in [rileym65/Elf-diskless](https://github.com/rileym65/Elf-diskless)
-* **/utils/stg_rom/tools_win10** -- Spare Time Gizmos Rom tools compiled for Windows 10 using the Microsoft Visual Studio for C Community Edition C compiler. Except for a few edits to update some references for Windows 10, the source files are largely unchanged. The source files for the [Elf2K and PicoElf EPROM v1.10](https://groups.io/g/cosmacelf/files/STG%20Elf2K/Elf2K%20and%20PicoElf%20EPROM%20v110%20BIOS%201.0.9.zip) are available in the files section of the [CosmacElf group](https://groups.io/g/cosmacelf) on groups.io.
+* **/utils/stg_rom/tools_win10** -- Spare Time Gizmos Rom tools compiled for Windows 10 using the Microsoft Visual Studio for C Community Edition C compiler. Except for a few edits to update some references for Windows 10, the source files are largely unchanged. The source files for the [Elf2K and PicoElf EPROM v1.12](https://groups.io/g/cosmacelf/files/STG%20Elf2K/Elf2K%20and%20PicoElf%20EPROM%20v110%20BIOS%201.0.9.zip) are available in the files section of the [CosmacElf group](https://groups.io/g/cosmacelf) on groups.io.
   * readme_tools.txt - Original information file from Spare Time Gizmos
   * romcksum.c - Tool to generate checksom for the ROM code.
   * romcksum.exe - Executable file for Windows 10
@@ -304,7 +304,7 @@ Repository Contents
   * sbc.doc - Basic/02 documentation.
 * **/pics/** -- Example pictures for the repository documentation 
 
-STG v1.10 + Video ROM Memory Map
+STG v1.12 + Video ROM Memory Map
 --------------------------------
 <table class="table table-hover table-striped table-bordered">
   <tr align="center">
@@ -394,22 +394,22 @@ These values are defined in the video.inc include file.
   </tr>
   <tr align="center">
     <td>IsVideoReady</td>
-    <td>A545H</td>
+    <td>A475H</td>
     <td colspan="2">Check that the video driver is loaded and started.</td> 
   </tr>       
   <tr align="center">
     <td>IsEchoOn</td>
-    <td>A475H</td>
+    <td>A45DH</td>
     <td colspan="2">Get the Echo Flag from the video buffers.</td> 
   </tr>
   <tr align="center">
     <td>SaveVideoRegs</td>
-    <td>A218H</td> 
+    <td>A1D2H</td> 
     <td colspan="2">Save all registers affected by video routines into the video buffer.</td>
   </tr>       
   <tr align="center">
     <td>RestoreVideoRegs</td>
-    <td>A249H</td>
+    <td>A203H</td>
     <td colspan="2">Restore all registers affected by video routines from the video buffer.</td>
   </tr>
   <tr align="center">       
@@ -418,7 +418,7 @@ These values are defined in the video.inc include file.
   </tr>       
   <tr align="center">
     <td>AllocateVideoBuffers</td>
-    <td>A1CCH</td>
+    <td>A23AH</td>
     <td colspan="2">This routine should be called first to set up the Video Buffers in HiMem.</td> 
   </tr>
   <tr align="center">
@@ -438,7 +438,7 @@ These values are defined in the video.inc include file.
   </tr>
   <tr align="center">
     <td>UnloadVideo</td>
-    <td>A3BFH</td> 
+    <td>A3A8H</td> 
     <td colspan="2">Return the Video Buffer memory to the system.</td>
   </tr>
   <tr align="center">
@@ -468,12 +468,12 @@ These values are defined in the video.inc include file.
   </tr>
   <tr align="center">
     <td>EchoOn</td>
-    <td>A4C7H</td> 
+    <td>A4D0H</td> 
     <td colspan="2">Save the text output kernel vectors in the Video Buffer and map them to echo display functions.</td>
   </tr>
   <tr align="center">
     <td>EchoOff</td>
-    <td>A4EFH</td> 
+    <td>A4F8H</td> 
     <td colspan="2">Restore the text output kernel vectors from the Video Buffer.</td>
   </tr>
   <tr align="center">
@@ -483,12 +483,12 @@ These values are defined in the video.inc include file.
   </tr>
   <tr align="center">
     <td>Draw32x64Image</td>
-    <td>A514H</td> 
+    <td>A400H</td> 
     <td colspan="2">Copy a 32x64 bit image (256 bytes) into the video buffer.</td>
   </tr>
   <tr align="center">
     <td>Draw64x64Image</td>
-    <td>A3CFH</td> 
+    <td>A431H</td> 
     <td colspan="2">Copy a 64x64 bit image (512 bytes) into the video buffer.</td>
   </tr>
   <tr align="center">
@@ -498,7 +498,7 @@ These values are defined in the video.inc include file.
   </tr>
   <tr align="center">
     <td>DrawPixel</td>
-    <td>A566H</td> 
+    <td>A51DH</td> 
     <td colspan="2">Set a single pixel in the video buffer at the specified display coordinates.</td>
   </tr>                     
 </table>
