@@ -1485,7 +1485,7 @@ GetEndMarker:           LOAD R9, O_VIDEO
 ; R9            Pointer to HiMem value
 ; RD            Pointer to video Marker
 ; Returns: 
-; RF.0          Zero if unloaded, non-zero if failed to unloaded
+; 
 ; =========================================================================================
 
 UnloadVideo:            CALL ClearVideoMarker   ; Wipe out Marker value 

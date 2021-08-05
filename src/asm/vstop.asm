@@ -22,7 +22,7 @@
 ; ************************************************************
 ; Define video code location as "ROM" or "MEM"
 ; ************************************************************                   
-VideoCode EQU "ROM"
+VideoCode EQU "MEM"
 
 ; ************************************************************
 ; Include the video definitions in the ROM
@@ -57,8 +57,8 @@ VideoCode EQU "ROM"
                     br  start             ; Jump past build info to code
 
 ; Build information
-binfo:              db  80H+7             ; Month, 80H offset means extended info
-                    db  23                ; Day
+binfo:              db  80H+8             ; Month, 80H offset means extended info
+                    db  4                 ; Day
                     dw  2021              ; Year
 
 ; Current build number
@@ -100,11 +100,12 @@ unload:             CALL ValidateVideo      ; check for video first
                     CALL EchoOff            ; turn off echo if needed
 continue:           CALL VideoOff           ; always stop the video  
                     CALL UnloadVIdeo        ; unload the video drivers
-                    GLO  RF
-                    BZ   cleared            ; if successful print message
-                    LOAD RF, cannot         ; otherwise, print unload error
-                    CALL O_MSG
-                    BR   done   
+                    ; Dealloc always works
+                    ; GLO  RF
+                    ; BZ   cleared            ; if successful print message
+                    ; LOAD RF, cannot         ; otherwise, print unload error
+                    ; CALL O_MSG
+                    ; BR   done   
                                      
 cleared:            LOAD RF, removed
                     CALL O_MSG 
