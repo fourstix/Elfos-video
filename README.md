@@ -1,4 +1,4 @@
-# Elfos-video
+clear# Elfos-video
 Video functions for 1861 Pixie Video Display written for the 1802 Pico/Elf v2 microcomputer.
 
 This code provides support for a basic video functions on an 1861 Pixie Video display
@@ -75,7 +75,7 @@ until a *vstop* command is issued.
 **vtest** - Test the Video and show status
 * Test the video and print out whether the video buffers are allocated, whether video is on and the location of the video buffers in high memory.
 
-**cls** - Clear the screen
+**clear** - Clear the screen
 * Clear the screen
 
 **draw *filename***
@@ -235,7 +235,7 @@ Repository Contents
   * **vstart.asm** - Start video by allocating video buffers in high memory and set flags. Use the vstart.bat batch file to assemble the vstart command
   * **vtest.asm** - Test video and show status. Use the vtest.bat batch file to assemble vtest command.
   * **vstop.asm** - Stop video, the -u option will also unload the video buffers and free up high memory.  Use the vstop.bat batch file to assemble the vstop command.
-  * **cls.asm** - Command to clear the display. Use the batch file Make_Cls.bat to assemble cls command.
+  * **clear.asm** - Command to clear the display. Use the batch file Make_clear.bat to assemble clear command.
   * **capture.asm** - Command to capture the display image into a file. Use the batch file Capture.bat to assemble the capture command.
   * **draw.asm** - Command to draw an image on the display. Use the Make_Draw.bat batch file to assemble the draw command.
   * **echo.asm** - Command to echo text from the Elf/OS to the display. Use the Make_Echo.bat batch file to assemble the echo command.
