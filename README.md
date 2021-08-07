@@ -64,8 +64,9 @@ Examples
 Elf/OS Video Programs
 ---------------------
 **vstart** - Start Video
-* Allocate the video buffers in high memory, if needed, and set the video flag to true.  The display can be updated
-until a *vstop* command is issued.
+* Option: -i
+* Allocate the video buffers in high memory, if needed, and set the video flag to true.  The display can be updated until a *vstop* command is issued.
+* Use the command *vstart -i* to load the video drivers from init.rc.
   
 **vstop** - Stop Video
 * Option: -u
