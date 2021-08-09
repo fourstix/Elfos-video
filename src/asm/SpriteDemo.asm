@@ -50,8 +50,8 @@ VideoCode EQU "ROM"
                     BR  start           ; Jump past build info to code
 
 ; Build information
-binfo:              db  80H+7           ; Month, 80H offset means extended info
-                    db  23              ; Day
+binfo:              db  80H+8           ; Month, 80H offset means extended info
+                    db  8               ; Day
                     dw  2021            ; Year
 
                     ; Current build number

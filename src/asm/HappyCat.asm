@@ -15,7 +15,7 @@
 ; ************************************************************
 ; Define video code location as "ROM" or "MEM"
 ; ************************************************************                   
-VideoCode EQU "MEM"
+VideoCode EQU "ROM"
 
 ; ************************************************************
 ; Include the video definitions in the ROM
@@ -63,8 +63,8 @@ VideoCode EQU "MEM"
 ; build information, with build number and text.
 ; **************************************************
 
-binfo:				db	80h+7		; May
-							db	23 			; Day
+binfo:				db	80h+8		; Month
+							db	8  			; Day
 							dw	2021		; Year
 
 build:				dw	4		; build

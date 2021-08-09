@@ -987,7 +987,7 @@ GetMarkerPointer:       LOAD R9, O_VIDEO
                         LDN  R9
                         ADI  02H        ; Video buffers 2 pages after display buffer start
                         PHI  RD
-                        LDI  12H        ; Marker string is after Echo vectors 
+                        LDI  20H        ; Marker string is after stack 
                         PLO  RD
                         RETURN
 ;------------------------------------------------------------------------------------------
@@ -1071,7 +1071,7 @@ SaveVideoRegs:          PUSH R8
                         LDN  R8           
                         ADI  02H          ; Video buffers 2 pages after display 
                         PHI  R8
-                        LDI  24H          ; point to top of stack
+                        LDI  1EH          ; point to top of stack
                         PLO  R8
                         SEX  R8           ; set x to video buffer stack pointer              
                         PUSH R9           ; Save video registers on stack
@@ -1103,7 +1103,7 @@ RestoreVideoRegs:       PUSH R8           ; save R8 on program stack
                         LDN  R8
                         ADI  02H          ; Video buffers 2 pages after display
                         PHI  R8
-                        LDI  18H          ; point to bottom of stack
+                        LDI  12H          ; point to bottom of stack
                         PLO  R8
                         SEX  R8           ; set x to video buffer stack pointer
                         POP  RF
@@ -1125,7 +1125,7 @@ RestoreVideoRegs:       PUSH R8           ; save R8 on program stack
 ; Parameters:
 ;                
 ; Internal:
-; R7.0          Allocation flags 04 for permanent block
+; R7.0          Allocation flags 44 for named, permanent block
 ; R7.1          Alignment, 255 (FF) for 256 page 
 ; RC            Requested Size to allocate                        
 ; RD            Pointer to target locations 
@@ -1143,8 +1143,8 @@ AllocateVideoBuffers:   LOAD RD, 0465H        ; Point RD to lowmem location in k
                         LDI  00H 
                         STR  RD
                         
-                        LOAD RC, 0224H        ; load (512 + 36) bytes for block size
-                        LOAD R7, 0FF04H       ; R7 = page aligned (FF) & permanent (04) 
+                        LOAD RC, 0226H        ; load (512 + 38) bytes for block size
+                        LOAD R7, 0FF44H       ; page aligned (FF) & named permanent (44) 
                         CALL O_ALLOC          ; Call Elf/OS allocation routine
                         
                         BNF  AVB_okay         ; DF = 1 means Elf/OS can't allocate block                                                                  
@@ -1166,6 +1166,8 @@ AVB_okay:               LOAD RD, O_VIDEO      ; save video buffer page in kernel
 
                         LOAD  RF, 00H
                         CALL SetStrRefValue   ; Clear string reference
+                        
+                        CALL ClearStackArea   ; Clear out the stack and padding bytes
                         
                         CALL SetVideoMarker   ; Set the marker at end of buffers
                         
@@ -1469,7 +1471,7 @@ GetEndMarker:           LOAD R9, O_VIDEO
                         LDN  R9
                         ADI  02H        ; Video buffers 2 pages after display buffer start
                         PHI  RD
-                        LDI  16H        ; Last non-null character in string 
+                        LDI  24H        ; Last non-null character in string 
                         PLO  RD
                         RETURN
 ;------------------------------------------------------------------------------------------
@@ -2003,6 +2005,29 @@ DP_SetBit:              LDN  RF                 ; Get the current value in the b
                         STR  RF                 ; Store it back in the video buffer
                         RETURN
 ;------------------------------------------------------------------------------------------
+; =========================================================================================
+; ClearEndBufffer - Zero out stack area and padding bytes before and after 
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
+; Parameters:
+;  
+; Internal:
+;  RD is used as a pointer into the video buffer
+; Returns:
+; 
+; =========================================================================================
+ClearStackArea:         CALL GetMarkerPointer     ; set RD to point to marker
+                        DEC  RD                   ; point RD to just before marker
+                        SEX  RD                   ; set X to data pointer
+CSA_clear:              LDI  00H                  ; zero out data bytes 
+                        STXD                      ; clear byte and back up
+                        GLO  RD                   ; check count for end
+                        SMI  11H                  ; check for one below padding byte
+                        BNZ  CSA_clear            ; keep going until all bytes cleared
+                        SEX  R2                   ; set x back to system stack  
+                        RETURN
+;------------------------------------------------------------------------------------------
 
 ; ******************************* VIDEO BUFFER MEMORY MAP *********************************
 
@@ -2029,11 +2054,13 @@ DP_SetBit:              LDN  RF                 ; Get the current value in the b
 ; page+2:0E,0F : Echo address vector for O_MSG
 ; page+2:10,11 : Echo address vector for O_INMSG
 ; =========================================================================================
-; page+2:12-17 : 6 Bytes for "Pixie",0 string to verify video buffers are loaded
+; page+2:12 : 1 Byte padding before register stack 
 ; =========================================================================================
-; page+2:18 : 1 Byte padding before register stack 
+; page+2:13-1E : Stack for Save/Restore Video Registers (R9, RA, RB, RC, RD and RF)  
 ; =========================================================================================
-; page+2:19-24 : Stack for Save/Restore Video Registers (R9, RA, RB, RC, RD and RF)  
+; page+2:1F : 1 Byte padding before marker 
+; =========================================================================================
+; page+2:20-25 : 6 Bytes for "Pixie",0 string to verify video buffers are loaded
 ; =========================================================================================
 
 

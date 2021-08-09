@@ -63,8 +63,8 @@ VideoCode EQU "ROM"
 ; build information, with build number and text.
 ; **************************************************
 
-binfo:				db	80h+7		; Month
-							db	23 			; Day
+binfo:				db	80h+8		; Month
+							db	8 			; Day
 							dw	2021		; Year
 
 build:				dw	4	      ; build
