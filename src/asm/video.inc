@@ -2,7 +2,7 @@
 ; Safe Video Routines - these save/restore registers 
 ; **************************************************************                    
 IsVideoReady:           EQU   0A478H
-IsEchoOn:               EQU   0A460H
+IsMirrorOn:             EQU   0A460H
 SaveVideoRegs:          EQU   0A1D2H
 RestoreVideoRegs:       EQU   0A203H
 ; **************************************************************
@@ -18,8 +18,8 @@ ClearScreen:            EQU   0A0C9H
 PutChar:                EQU   09FC7H
 Print:                  EQU   0A185H
 Println:                EQU   0A199H
-EchoOn:                 EQU   0A4D3H
-EchoOff:                EQU   0A4FBH
+MirrorOn:               EQU   0A4D3H
+MirrorOff:              EQU   0A4FBH
 DrawString              EQU   09ECCH
 Draw32x64Image:         EQU   0A403H
 Draw64x64Image:         EQU   0A434H

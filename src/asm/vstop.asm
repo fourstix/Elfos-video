@@ -94,10 +94,10 @@ bad_arg:            LOAD RF, usage          ; print bad arg message and end
 unload:             CALL ValidateVideo      ; check for video first
                     GLO  RF
                     BNZ  fail               ; fail if drivers are not loaded
-                    CALL IsEchoOn           ; see if echo is on
+                    CALL IsMirrorOn         ; see if mirror is on
                     GLO  RF
                     BZ   continue
-                    CALL EchoOff            ; turn off echo if needed
+                    CALL MirrorOff          ; turn off mirror if needed
 continue:           CALL VideoOff           ; always stop the video  
                     CALL UnloadVIdeo        ; unload the video drivers
                     ; Dealloc always works

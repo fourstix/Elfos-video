@@ -57,7 +57,7 @@ Examples
    <td colspan="2"><img src="https://github.com/fourstix/Elfos-video/blob/main/pics/Config.jpg"></td>
   </tr>
   <tr align="center">
-   <td colspan="2">Pico/Elf v2 with the STG v1.12 + Video EPROM and an STG RTC/NVR/UART card and a PicoElf Pixie Video GLCD card showing the output from the echo command.</td>
+   <td colspan="2">Pico/Elf v2 with the STG v1.12 + Video EPROM and an STG RTC/NVR/UART card and a PicoElf Pixie Video GLCD card showing the output from the mirror command.</td>
   </tr>
 </table>
 
@@ -85,10 +85,10 @@ Elf/OS Video Programs
 **capture *filename***
 * Write the image in the video buffer to a 512-byte file named *filename* on the disk.
 
-**echo**
-* Turn echo on and off.  When echo is on, text written using the O_MSG, O_TYPE and O_INMSG bios routines will be written to the display and to the serial output.  
-* If echo is already on, *echo* will turn the echo function off.  
-* The echo command is only available when the video routines are in ROM, since they must be available to the Elf/OS after the *echo* command has run.
+**mirror**
+* Mirror output text to the display.  When mirror is on, text written using the O_MSG, O_TYPE and O_INMSG kernel routines will be written to the display and to the serial output.  
+* If mirror is already on, *mirror* will turn the mirror function off.  
+* The mirror command is only available when the video routines are in ROM, since they must be available to the Elf/OS after the *mirror* command has run.
 
 **write *text***
 * Write the string *text* to the display.
@@ -144,13 +144,13 @@ Video API
 **Print** -- Write a string to the display at the cursor position.
 * RF contains an pointer to the address of the character buffer with the null-terminated string.
 
-**IsEchoOn** -- Get the status of the Echo function
+**IsMirrorOn** -- Get the status of the Mirror function
 * Returns RF.0 non-zero (true) if on, zero if off.
 * Safe - This function saves and restores registers used.
 
-**EchoOn** -- Turn echo on. Text written by O_TYPE, O_MSG and O_INMSG will be printed to the display and to the serial output.
+**MirrorOn** -- Turn mirror on. Text written by O_TYPE, O_MSG and O_INMSG will be printed to the display and to the serial output.
 
-**EchoOff** -- Turn echo off. Text written by O_TYPE, O_MSG and O_INMSG will no longer be copied to the display.
+**MirrorOff** -- Turn mirror off. Text written by O_TYPE, O_MSG and O_INMSG will no longer be copied to the display.
 
 **DrawString** -- Write a text string to an explicit X,Y location on the display.
 * RA.0 contains the X coordinate of the string
@@ -193,7 +193,7 @@ Video API Notes
 
 * The UnloadVideo can be used to return video buffer memory to the system.
 
-* The IsVideoReady and IsEchoOn functions save and restore registers that they use and are 
+* The IsVideoReady and IsMirrorOn functions save and restore registers that they use and are 
   safe. The other video functions do not preserve register values.
 
 * The SaveVideoRegs and RestoreVideoRegs functions can be used to make video functions safe
@@ -239,7 +239,7 @@ Repository Contents
   * **clear.asm** - Command to clear the display. Use the batch file Make_clear.bat to assemble clear command.
   * **capture.asm** - Command to capture the display image into a file. Use the batch file Capture.bat to assemble the capture command.
   * **draw.asm** - Command to draw an image on the display. Use the Make_Draw.bat batch file to assemble the draw command.
-  * **echo.asm** - Command to echo text from the Elf/OS to the display. Use the Make_Echo.bat batch file to assemble the echo command.
+  * **mirror.asm** - Command to mirror text from the Elf/OS to the display. Use the mirror.bat batch file to assemble the mirror command.
   * **write.asm** - Command to write text to the display. Use the Make_Write.bat batch file to assemble the write command.
   * **HappyCat.asm** - Draw a 32x64 bit image of a cat to the display. Use the HappyCat.bat batch file to assemble the HappyCat demo.
   * **HappyDog.asm** - Draw a 64x64 bit image of a dog to the display. Use the HappyDog.bat batch file to assemble the HappyDog demo.  
@@ -252,10 +252,8 @@ Repository Contents
   * **kernel.inc** - Include file for Elf/OS kernel definitions from [rileym65/Elf-Elfos-Kernel](https://github.com/rileym65/Elf-Elfos-Kernel)
   * **StdDefs.asm** - standard definitions and macros used in assembly source files.  
   * These files can be compiled to run with the video routines in ROM or in the command memory, except
-  for echo which works only with the video routines in ROM.  Setting the VideoCode constant to "ROM"
-  in the code will use the addresses in video.inc to locate the routines, setting the VideoCode constant
-  to MEM will locate the routines in the Elf/OS user memory.  The echo command relies on the routines
-  remaining available while the Elf/OS is running, so it requires the routines to be located in ROM.
+  for mirror which works only with the video routines in ROM.  Setting the VideoCode constant to "ROM"
+  in the code will use the addresses in video.inc to locate the routines, setting the VideoCode constant to MEM will locate the routines in the Elf/OS user memory.  The mirror command relies on the routines remaining available while the Elf/OS is running, so it requires the routines to be located in ROM.
 * **/src/bas/** -- Example programs for the Basic/02 compiler using Elfos-video API routines located in ROM.
   * **DrawStars.bas** - Basic/02 16-bit program that uses the Elfos-video API in ROM to draw random dots on the display. Use the DrawStars.bat batch file to compile the program.
   * **DrawSine.bas** - Basic/02 32-bit program that uses the Elfos-video API in ROM to draw a sine wave on the display. Use the DrawSine.bat batch file to compile the program.
@@ -399,9 +397,9 @@ These values are defined in the video.inc include file.
     <td colspan="2">Check that the video driver is loaded and started.</td> 
   </tr>       
   <tr align="center">
-    <td>IsEchoOn</td>
+    <td>IsMirrorOn</td>
     <td>A45DH</td>
-    <td colspan="2">Get the Echo Flag from the video buffers.</td> 
+    <td colspan="2">Get the Mirror Flag from the video buffers.</td> 
   </tr>
   <tr align="center">
     <td>SaveVideoRegs</td>
@@ -468,12 +466,12 @@ These values are defined in the video.inc include file.
     <td colspan="2">Read characters from a string and write them to the Video Buffer, advancing the cursor. Then write a new line character and move the cursor to the next line..</td>
   </tr>
   <tr align="center">
-    <td>EchoOn</td>
+    <td>MirrorOn</td>
     <td>A4D0H</td> 
-    <td colspan="2">Save the text output kernel vectors in the Video Buffer and map them to echo display functions.</td>
+    <td colspan="2">Save the text output kernel vectors in the Video Buffer and map them to mirror display functions.</td>
   </tr>
   <tr align="center">
-    <td>EchoOff</td>
+    <td>MirrorOff</td>
     <td>A4F8H</td> 
     <td colspan="2">Restore the text output kernel vectors from the Video Buffer.</td>
   </tr>

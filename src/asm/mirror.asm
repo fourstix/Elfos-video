@@ -1,5 +1,5 @@
 ; *******************************************************************************************
-; Echo - Write strings from Elf/OS message functions to video display and serial output
+; Mirror - Write strings from Elf/OS message functions to video display and serial output
 ;
 ; Copyright (c) 2021 by Gaston Williams
 ;
@@ -13,7 +13,7 @@
                       INCLUDE   "bitfuncs.inc"
 
 ; ************************************************************
-; Echo is only supported when the video code located is in ROM
+; Mirror is only supported when the video code located is in ROM
 ; ************************************************************                   
                     INCLUDE     video.inc                                          
                                                  
@@ -65,22 +65,22 @@ start:              CALL ValidateVideo      ; check if video is loaded
                     CALL O_MSG
                     LBR  O_WRMBOOT          ; return to Elf/OS
                         
-loaded:             CALL IsEchoOn           ; check echo status
+loaded:             CALL IsMirrorOn         ; check mirror status
                     GLO  RF
-                    BZ   turn_on            ; zero means echo is off
-                    CALL EchoOff            ; turn echo off
-                    LOAD RF, echo_off
+                    BZ   turn_on            ; zero means mirror is off
+                    CALL MirrorOff          ; turn mirror off
+                    LOAD RF, mirror_off
                     CALL O_MSG
                     LBR  O_WRMBOOT          ; return to Elf/OS
                     
-turn_on:            CALL EchoOn             ; turn echo on                    
-                    LOAD RF, echo_on
+turn_on:            CALL MirrorOn           ; turn mirror on                    
+                    LOAD RF, mirror_on
                     CALL O_MSG
                     LBR  O_WRMBOOT          ; return to Elf/OS
                     
 failed:             db "Video is not started.",10,13,0
-echo_on:            db "Echo is on.",10,13,0 
-echo_off:           db "Echo is off.",10,13,0                        
+mirror_on:          db "Mirror is on.",10,13,0 
+mirror_off:         db "Mirror is off.",10,13,0                        
                       
 ;----------------------------------------------------------------------------------------
 ; define end of execution block

@@ -110,17 +110,17 @@ v_page:     CALL O_INMSG
             LOAD RF, buffer
             CALL O_MSG
         
-; Echo is only available when video routines are in ROM    
+; Mirror is only available when video routines are in ROM    
     IF VideoCode == "ROM"        
             CALL O_INMSG
-            db   "Echo is ",0
-            CALL IsEchoOn            ; check echo status
+            db   "Mirror is ",0
+            CALL IsMirrorOn            ; check mirror status
             GLO  RF
-            BZ   echo_off            ; zero means echo is off
+            BZ   mirror_off            ; zero means mirror is off
             CALL O_INMSG
             db "ON.",10,13,0
             BR exit
-echo_off:   CALL O_INMSG
+mirror_off: CALL O_INMSG
             db "OFF.",10,13,0        
     ENDIF
                
