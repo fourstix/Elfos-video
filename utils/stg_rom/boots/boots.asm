@@ -368,8 +368,14 @@
 ;
 ; 109	-- [edit deleted - not  good idea!]
 ; 110	-- [edit deleted - not  good idea!]
+;
+; 111	-- Fix the conditionals at PIXTEST: so that the PIXIE code still works
+; 	   if VIDEO is not defined.  (Thanks, Gaston Williams!).=
+;
+; 112	-- Reorder some of the code around FOLD: and TCRLF et al to fix some
+;	   off page errors caused by edit 111.
 ;--
-MONVER	.EQU	110
+MONVER	.EQU	112
 
 ; SUGGESTIONS FOR ENHANCEMENTS
 ; Add hardware flow control for loading HEX files over UART?
@@ -2908,13 +2914,10 @@ PIXTEST:CALL(ISEOL)		; there should be no more text
 #ifdef VIDEO
 	CALL(NOCRTC)		; not allowed if the real video card is active
 	BNF	PIXIE0		; Ok - go start
-	RETURN			  ; not OK - give up now
-#else
-	PIXIE_ON		; enable the display
+	RETURN			; not OK - give up now
 #endif
-PIXIE0:	INLMES("EF1 ... ")
- 
-
+PIXIE0:	PIXIE_ON		; enable the display 
+	INLMES("EF1 ... ")
 
 ;   Count the number of cycles in a complete period, low then high then
 ; low again, in EF1.  If the count overflows, then something's wrong...
@@ -3437,6 +3440,27 @@ NOCRT1:	.TEXT	"?VIDEO ACTIVE\r\n\000"
 #endif
 
 	.EJECT
+;	.SBTTL	Type Various Special Characters
+
+; This routine will type a carriage return/line feed pair on the console...
+TCRLF:	LDI	CHCRT		; type carriage return
+	CALL(F_TTY)		; ...
+	LDI	CHLFD		; and then line feed
+	LBR	F_TTY		; ...
+
+; Type a single space on the console...
+TSPACE:	LDI	' '		; this is what we want
+	LBR	F_TTY		; and this is where we want it
+
+; Type a (horizontal) tab...
+TTABC:	LDI	CHTAB		; ...
+	LBR	F_TTY		; ...
+
+; Type a question mark...
+TQUEST:	LDI	'?'		; ...
+	LBR	F_TTY		; ...
+
+	.EJECT
 ;	.SBTTL	Scan Two and Four Digit Hex Values
 
 ;   This routine will read a four digit hex number pointed to by P1 and return
@@ -3578,27 +3602,6 @@ TDEC16:	RLDI(P2,10)		; set the divisor
 TDEC1A:	CALL(TDEC16)		; keep typing P1 recursively
 TDEC1B:	POPD			; then get back the remainder
 	LBR	THEX1		; type it in ASCII and return
-
-	.EJECT
-;	.SBTTL	Type Various Special Characters
-
-; This routine will type a carriage return/line feed pair on the console...
-TCRLF:	LDI	CHCRT		; type carriage return
-	CALL(F_TTY)		; ...
-	LDI	CHLFD		; and then line feed
-	LBR	F_TTY		; ...
-
-; Type a single space on the console...
-TSPACE:	LDI	' '		; this is what we want
-	LBR	F_TTY		; and this is where we want it
-
-; Type a (horizontal) tab...
-TTABC:	LDI	CHTAB		; ...
-	LBR	F_TTY		; ...
-
-; Type a question mark...
-TQUEST:	LDI	'?'		; ...
-	LBR	F_TTY		; ...
 
 	.EJECT
 ;	.SBTTL	BASIC, Forth, ASM, VISUAL and SEDIT Commands
@@ -3777,3 +3780,4 @@ NCC1701:
 
 	.EJECT
 	.END
+

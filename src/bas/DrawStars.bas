@@ -1,13 +1,13 @@
 
 10  asm
              ; define labels for video routines in ROM
-isready:     equ 0A545H
-saveregs:    equ 0A218H
-restoreregs: equ 0A249H
-println:     equ 0A199H 
-update:      equ 0A280H
+isready:     equ 0A478H
+saveregs:    equ 0A1D2H
+restoreregs: equ 0A203H
+println:     equ 0A199H
+update:      equ 0A283H   
 clear:       equ 0A0C9H
-drawpixel:   equ 0A566H 
+drawpixel:   equ 0A520H  
     end     
 20  R = 0
 30  PRINT "Checking video status."

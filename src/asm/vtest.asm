@@ -58,12 +58,12 @@ VideoCode EQU "ROM"
             br     start              ; Jump past build info to code
 
 ; Build information
-binfo:      db      80H+7             ; Month, 80H offset means extended info
-            db      9                 ; Day
+binfo:      db      80H+8             ; Month, 80H offset means extended info
+            db      8                 ; Day
             dw      2021              ; Year
 
 ; Current build number
-build:      dw      3
+build:      dw      4
 
             ; Must end with 0 (null)
             db      'Copyright 2021 Gaston Williams',0
@@ -110,17 +110,17 @@ v_page:     CALL O_INMSG
             LOAD RF, buffer
             CALL O_MSG
         
-; Echo is only available when video routines are in ROM    
+; Mirror is only available when video routines are in ROM    
     IF VideoCode == "ROM"        
             CALL O_INMSG
-            db   "Echo is ",0
-            CALL IsEchoOn            ; check echo status
+            db   "Mirror is ",0
+            CALL IsMirrorOn            ; check mirror status
             GLO  RF
-            BZ   echo_off            ; zero means echo is off
+            BZ   mirror_off            ; zero means mirror is off
             CALL O_INMSG
             db "ON.",10,13,0
             BR exit
-echo_off:   CALL O_INMSG
+mirror_off: CALL O_INMSG
             db "OFF.",10,13,0        
     ENDIF
                

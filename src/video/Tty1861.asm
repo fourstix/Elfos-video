@@ -5,7 +5,7 @@
 ; These functions implement basic terminal functions in 64x64 bit graphics.
 ;
 ; Notes:
-;       1. AllocateVideoBuffers should be called first to set up the Video Buffers into HiMem.
+;       1. AllocateVideoBuffers should be called first to set up the Video Buffers.
 ;       The ValidateVideo function can be used to verify video buffers are allocated.
 ;
 ;       2. VideoOn should be called to initialize the system variables, and the UpdateVideo
@@ -27,6 +27,7 @@
 ; Gaston Williams, Nov,  2020 - Added support for EOT to clear screen
 ; Gaston Williams, May,  2021 - Added support for video buffers in HiMem
 ; Gaston Williams, July, 2021 - Fixed issues with Save/Restore registers
+; Gaston Williams, July, 2021 - Updated to use Elf/OS Alloc/Dealloc kernel routines
 ; *******************************************************************************************
 
 ; **************************************************************
@@ -193,9 +194,9 @@ VideoOn:                LOAD R1, DisplayInt
                         PLO  RF
                         CALL SetVideoFlag
 
-                        LDI  00H                ; set the video flag off
+                        LDI  00H                ; set the mirror flag off
                         PLO  RF
-                        CALL SetEchoFlag
+                        CALL SetMirrorFlag
 
                         CALL ClearScreen        ; set cursor to home                                              
                         
@@ -986,7 +987,7 @@ GetMarkerPointer:       LOAD R9, O_VIDEO
                         LDN  R9
                         ADI  02H        ; Video buffers 2 pages after display buffer start
                         PHI  RD
-                        LDI  13H        ; Marker string is after Echo vectors 
+                        LDI  20H        ; Marker string is after stack 
                         PLO  RD
                         RETURN
 ;------------------------------------------------------------------------------------------
@@ -1033,67 +1034,6 @@ SetVideoMarker:         CALL GetMarkerPointer   ; Load RD with location of strin
 ;------------------------------------------------------------------------------------------
 
 ; =========================================================================================
-; AllocateVideoBuffers - Set the Video Buffers and code into HiMem
-;
-; Note: Unsafe - This function does *not* save and restore registers used by video routines
-;
-; Parameters:
-;                
-; Internal:                        
-; RD            Pointer to Interrupt and Marker String targets 
-; RF            Pointer to Interrupt source and Marker source
-; R9.0          Original Low Himem byte value
-;
-; Returns: 
-;     
-; =========================================================================================
-
-AllocateVideoBuffers:   LOAD RF, O_HIMEM        ; point RF to available HiMem
-                        LDA  RF                 ; retrieve HiMem location into RD
-                        PHI  RD
-                        LDA  RF          
-                        SMI  24H                ; subtract 36 for buffers
-                        GHI  RD                 ; borrow is set if less than 36 bytes available
-                        SMBI 02                 ; subtract two pages with borrow
-                        PHI  RD  
-                        LDI  00H                ; set RD at page boundary
-                        PLO  RD       
-
-                        LOAD RF, O_VIDEO        ; save video buffer page in kernel
-                        GHI  RD
-                        STR  RF
-                        DEC  RD                 ; Set HiMem to one below video buffers
-                        LOAD RF, O_HIMEM        ; Save new HiMem value in Kernel  
-                        GHI  RD    
-                        STR  RF                 ; Save hi byte
-                        INC  RF
-                        LDN  RF                 ; get original low HiMem byte
-                        PLO  R9                 
-                        GLO  RD                 ; get new lo byte 
-                        STR  RF                 ; Save lo byte
-                        
-                        GLO  R9                 ; get the original lo byte value
-                        PLO  RF                 ; save in video buffer
-                        CALL SetLoByteValue     
-                        
-                        LDI  00h
-                        PLO  RF
-                        CALL SetVideoFlag       ; Make sure video flag is false                        
-
-                        LDI  00h
-                        PLO  RF
-                        CALL SetNewLineFlag     ; Make sure NewLine flag is false
-
-                        LOAD  RF, 00h
-                        CALL SetStrRefValue     ; Clear string reference
-                        
-                        CALL SetVideoMarker     ; Set the marker at end of buffers                      
-                        
-                        
-                        RETURN  
-;------------------------------------------------------------------------------------------
-
-; =========================================================================================
 ; GetVideoFlag - Get the Video Flag from the buffers
 ;
 ; Note: Unsafe - This function does *not* save and restore registers used by video routines
@@ -1131,7 +1071,7 @@ SaveVideoRegs:          PUSH R8
                         LDN  R8           
                         ADI  02H          ; Video buffers 2 pages after display 
                         PHI  R8
-                        LDI  24H          ; point to top of stack
+                        LDI  1EH          ; point to top of stack
                         PLO  R8
                         SEX  R8           ; set x to video buffer stack pointer              
                         PUSH R9           ; Save video registers on stack
@@ -1163,7 +1103,7 @@ RestoreVideoRegs:       PUSH R8           ; save R8 on program stack
                         LDN  R8
                         ADI  02H          ; Video buffers 2 pages after display
                         PHI  R8
-                        LDI  18H          ; point to bottom of stack
+                        LDI  12H          ; point to bottom of stack
                         PLO  R8
                         SEX  R8           ; set x to video buffer stack pointer
                         POP  RF
@@ -1175,6 +1115,65 @@ RestoreVideoRegs:       PUSH R8           ; save R8 on program stack
                         SEX  R2           ; set x back to program stack pointer
                         POP  R8           ; restore R8
                         RETURN
+;------------------------------------------------------------------------------------------
+
+; =========================================================================================
+; AllocateVideoBuffers - Set the Video Buffers and code into HiMem
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
+; Parameters:
+;                
+; Internal:
+; R7.0          Allocation flags 44 for named, permanent block
+; R7.1          Alignment, 255 (FF) for 256 page 
+; RC            Requested Size to allocate                        
+; RD            Pointer to target locations 
+; RF            Pointer to Allocated memory block
+; RF.0          Flag values to set in video buffer
+;
+; Returns: 
+; RF.0          non-zero if Elf/OS failed to allocate memory block    
+; =========================================================================================
+
+AllocateVideoBuffers:   LOAD RD, 0465H        ; Point RD to lowmem location in kernel
+                        LDI  60H              ; load lowmem with floor of $6000
+                        STR  RD               ; Elf/OS will not allocate a block
+                        INC  RD               ; of memory below this floor value
+                        LDI  00H 
+                        STR  RD
+                        
+                        LOAD RC, 0226H        ; load (512 + 38) bytes for block size
+                        LOAD R7, 0FF44H       ; page aligned (FF) & named permanent (44) 
+                        CALL O_ALLOC          ; Call Elf/OS allocation routine
+                        
+                        BNF  AVB_okay         ; DF = 1 means Elf/OS can't allocate block                                                                  
+                        LDI  0FFH             ; load out of memory flag into RF.0
+                        PLO  RF
+                        RETURN                 
+                                                
+AVB_okay:               LOAD RD, O_VIDEO      ; save video buffer page in kernel
+                        GHI  RF
+                        STR  RD
+                                              
+                        LDI  00h
+                        PLO  RF
+                        CALL SetVideoFlag     ; Make sure video flag is false                        
+
+                        LDI  00h
+                        PLO  RF
+                        CALL SetNewLineFlag   ; Make sure NewLine flag is false
+
+                        LOAD  RF, 00H
+                        CALL SetStrRefValue   ; Clear string reference
+                        
+                        CALL ClearStackArea   ; Clear out the stack and padding bytes
+                        
+                        CALL SetVideoMarker   ; Set the marker at end of buffers
+                        
+                        LDI  00H              ; clear RF.0 to indicate memory allocated
+                        PLO  RF                                       
+                        RETURN  
 ;------------------------------------------------------------------------------------------
 
 ; =========================================================================================
@@ -1327,7 +1326,7 @@ GetNewLineFlag:         CALL GetNewlinePointer    ; set pointer to video flag
 ;------------------------------------------------------------------------------------------
 
 ; =========================================================================================
-; EchoChar- Write character to serial out and display
+; MirrorChar- Write character to serial out and display
 ;
 ; Safe - This function saves and restores registers
 ;
@@ -1339,7 +1338,7 @@ GetNewLineFlag:         CALL GetNewlinePointer    ; set pointer to video flag
 ; 
 ; =========================================================================================
 
-EchoChar:           PLO  RE                 ; save D in RE.0
+MirrorChar:         PLO  RE                 ; save D in RE.0
                     STXD                    ; Save D, DF, R9, RD and RF on stack 
                     SHRC                    ; put DF in hi bit 
                     STXD                    ; 
@@ -1364,18 +1363,18 @@ EchoChar:           PLO  RE                 ; save D in RE.0
                     CALL SaveVideoRegs      ; save state after Bios call
                     CALL GetVideoFlag       ; check the video flag
                     GLO  RF                      
-                    BZ   EC_Off             ; skip video update if off
+                    BZ   MC_Off             ; skip video update if off
 
                     CALL GetCharValue       ; get the RF value from video buffer
                     CALL PutChar            ; call display routine
                     CALL UpdateVideo
-EC_Off:             CALL RestoreVideoRegs   ; restore state after Bios call
+MC_Off:             CALL RestoreVideoRegs   ; restore state after Bios call
 
                     RETURN                  ; return to Elf/OS
 ;------------------------------------------------------------------------------------------
 
 ; =========================================================================================
-; EchoMsg - Write string to serial out and display
+; MirrorMsg - Write string to serial out and display
 ;
 ; Safe - This function saves and restores registers
 ;
@@ -1387,7 +1386,7 @@ EC_Off:             CALL RestoreVideoRegs   ; restore state after Bios call
 ; 
 ; =========================================================================================
 
-EchoMsg:            STXD                    ; Save D, DF, R9 and RD on stack 
+MirrorMsg:          STXD                    ; Save D, DF, R9 and RD on stack 
                     SHRC                    ; put DF in hi bit 
                     STXD                    ; 
                     PUSH R9                 ;                     
@@ -1405,16 +1404,16 @@ EchoMsg:            STXD                    ; Save D, DF, R9 and RD on stack
                     CALL SaveVideoRegs      ; save state after Bios call
                     CALL GetVideoFlag       ; check the video flag
                     GLO RF                      
-                    BZ   EM_Off             ; skip video update if off
+                    BZ   MM_Off             ; skip video update if off
                     CALL GetStrRefValue     ; Get original string reference
                     CALL Print              ; call display routine
                     CALL UpdateVideo
-EM_Off:             CALL RestoreVideoRegs   ; restore state after Bios call
+MM_Off:             CALL RestoreVideoRegs   ; restore state after Bios call
                     RETURN                  ; return to Elf/OS
 ;------------------------------------------------------------------------------------------
 
 ; =========================================================================================
-; EchoInMsg - Write inlined string to serial out and display
+; MirrorInMsg - Write inlined string to serial out and display
 ;
 ; Safe - This function saves and restores registers
 ;
@@ -1426,7 +1425,7 @@ EM_Off:             CALL RestoreVideoRegs   ; restore state after Bios call
 ; 
 ; =========================================================================================
 
-EchoInMsg:          STXD                    ; Save D, DF, R9 and RD on stack 
+MirrorInMsg:        STXD                    ; Save D, DF, R9 and RD on stack 
                     SHRC                    ; put DF in hi bit 
                     STXD                    ; save df on stack
                     PUSH R9                 ;                     
@@ -1445,13 +1444,13 @@ EchoInMsg:          STXD                    ; Save D, DF, R9 and RD on stack
                     CALL SaveVideoRegs      ; save state after Bios call
                     CALL GetVideoFlag       ; check the video flag
                     GLO  RF                      
-                    BZ   EIM_Off            ; skip video update if off                    
+                    BZ   MIM_Off            ; skip video update if off                    
                     CALL GetStrRefValue     ; Get original RF reference
                     CALL Print              ; call display routine
                     CALL UpdateVideo
-EIM_Off:            CALL RestoreVideoRegs   ; restore state after Bios call
-EIM_Skip:           LDA  R6                 ; move R6 past inline string
-                    BNZ  EIM_Skip           ; return to location after null
+MIM_Off:            CALL RestoreVideoRegs   ; restore state after Bios call
+MIM_Skip:           LDA  R6                 ; move R6 past inline string
+                    BNZ  MIM_Skip           ; return to location after null
                     RETURN                  ; return to Elf/OS
 ;------------------------------------------------------------------------------------------
 
@@ -1472,38 +1471,8 @@ GetEndMarker:           LOAD R9, O_VIDEO
                         LDN  R9
                         ADI  02H        ; Video buffers 2 pages after display buffer start
                         PHI  RD
-                        LDI  17H        ; Last non-null character in string 
+                        LDI  24H        ; Last non-null character in string 
                         PLO  RD
-                        RETURN
-;------------------------------------------------------------------------------------------
-
-; =========================================================================================
-; CheckVideoPage - Check to see if Video page can be safely unloaded.  The kernel HiMem 
-;                  value must be one byte below Video page to be safe to unload.
-;
-; Note: Unsafe - This function does *not* save and restore registers used by video routines
-;
-; Parameters:
-;                
-; Internal:                        
-; R9            Pointer to HiMem value and Video Page location
-; RD            HiMem value for computation
-; Returns: 
-; RF.0          Zero if safe to unload, non-zero if cannot be unloaded safely
-; =========================================================================================
-
-CheckVideoPage:         LOAD R9, O_VIDEO        ; get the video page
-                        LDN  R9
-                        STR  R2                 ; save in stack for subtraction
-                        LOAD R9, O_HIMEM        ; get the HiMem page
-                        LDA  R9
-                        PHI  RD                 ; set up RD
-                        LDN  R9                 ; with Himem value
-                        PLO  RD                 
-                        INC  RD                 ; add one to HiMem value
-                        GHI  RD                 ; check the page value
-                        SM                      ; check if equal to video page
-                        PLO  RF                 ; put difference in RF.0
                         RETURN
 ;------------------------------------------------------------------------------------------
                         
@@ -1518,114 +1487,19 @@ CheckVideoPage:         LOAD R9, O_VIDEO        ; get the video page
 ; R9            Pointer to HiMem value
 ; RD            Pointer to video Marker
 ; Returns: 
-; RF.0          Zero if unloaded, non-zero if failed to unloaded
-; =========================================================================================
-
-UnloadVideo:            CALL CheckVideoPage
-                        GLO  RF
-                        BNZ  ULV_Done           ; if himem changed, we can't safely unload
-                        
-                        CALL ClearVideoMarker   ; Wipe out Marker value 
-
-                        CALL RestoreHiMem       ; set kernel HiMem back to original value
-                        LDI  00H
-                        PLO  RF                 ; indicate drivers were unloaded   
-ULV_Done:               RETURN        
-;------------------------------------------------------------------------------------------
-
-; =========================================================================================
-; Draw64x64Image - Copy a 64x64 bit image into the video buffer
-;
-; Note: Unsafe - This function does *not* save and restore registers used by video routines
-;
-; Parameters:
-; RF            Pointer to 512 byte image data
-;
-; Internal:
-; R9            Pointer to buffer page value
-; RA            Pointer to video buffer
-; =========================================================================================
-
-Draw64x64Image:            			LOAD R9, O_VIDEO   ; prepare the pointer to the video buffer
-                                LDN  R9
-                                PHI  RA
-                                LDI  00H
-                                PLO  RA
-
-D64_Loop1:                      LDA  RF							; Load first page of display	
-                                STR  RA
-                                INC  RA
-                                GLO  RA
-                                BNZ  D64_Loop1
-
-D64_Loop2:                      LDA  RF							; Load second page of display
-                                STR  RA
-                                INC  RA
-                                GLO  RA
-                                BNZ  D64_Loop2
-
-                                RETURN
-;------------------------------------------------------------------------------------------
-
-; =========================================================================================
-; GetLoBytePointer - Get a pointer to the original lo Himem byte value
-;
-; Note: Unsafe - This function does *not* save and restore registers used by video routines
-;
-; Parameters:
-;
-; Internal:
-; R9            Pointer to video buffer page
-;
-; Returns:
-; RD            Pointer Lo Byte buffer in video memory
-; =========================================================================================
-GetLoBytePointer:       LOAD R9, O_VIDEO
-                        LDN  R9
-                        ADI  02H        ; Video buffers 2 pages after display buffer start
-                        PHI  RD
-                        LDI  09         ; Flag buffer is immediately after Newline flag 
-                        PLO  RD
-                        RETURN
-;------------------------------------------------------------------------------------------
-                        
-; =========================================================================================
-; SetLoByteValue - Set the lo byte value
-;
-; Note: Unsafe - This function does *not* save and restore registers used by video routines
-;
-; Note: Internal function used to save the original lo Himem byte value
-;
-; Parameters:
-; RF.0          Original lo Himem value
-; Internal:
-; RD            Pointer Lo Byte buffer in video memory
-; =========================================================================================
-SetLoByteValue:         CALL GetLoBytePointer          
-                        GLO  RF                 ; get the value for the lo byte
-                        STR  RD                 ; store the value
-                        
-                        RETURN
-;------------------------------------------------------------------------------------------
-
-; =========================================================================================
-; GetLoByteValue - Get the lo byte value
-;
-; Note: Unsafe - This function does *not* save and restore registers used by video routines
-; Note: Internal function used to restore the original lo Himem byte value
-;
-; Parameters:
 ; 
-; Internal:
-; RD            Pointer Lo Byte buffer in video memory
-; Returns:
-; RF.0          Original lo Himem value
 ; =========================================================================================
-GetLoByteValue:         CALL GetLoBytePointer
-                        LDN  RD                 ; load the value
-                        PLO  RF                 ; put the value for return
+
+UnloadVideo:            CALL ClearVideoMarker   ; Wipe out Marker value 
+
+                        LOAD R9, O_VIDEO   ; prepare the pointer to the video buffer
+                        LDN  R9
+                        PHI  RF
+                        LDI  00H
+                        PLO  RF   
+                        CALL O_DEALLOC
                         
-                        RETURN
+                        RETURN        
 ;------------------------------------------------------------------------------------------
 
 ; =========================================================================================
@@ -1655,36 +1529,6 @@ ClearVideoMarker:       CALL GetEndMarker     ; Load RD last non-null character 
 ;------------------------------------------------------------------------------------------
 
 ; =========================================================================================
-; RestoreHiMem -  Restore the kernel HiMem value back to it's original value
-;
-; Note: Unsafe - This function does *not* save and restore registers used by video routines
-;
-; Parameters:
-;                
-; Internal:                        
-; RD            Pointer to HiMem value in kernel
-; RF.0          Temporary holder for orignal lo byte
-; RF            Pointer to video page to calculate hi byte
-;
-; Returns: 
-;     
-; =========================================================================================
-
-RestoreHiMem:           CALL GetLoByteValue       ; get the original low byte
-                        LOAD RD, O_HIMEM
-                        INC  RD                   ; do lo byte first                        
-                        GLO  RF                        
-                        STR  RD                   ; set lo byte of himem
-                        DEC  RD
-                        SDI  12H                 ; df = 1 if >= 16
-                        LOAD RF, O_VIDEO          ; get the video pages
-                        LDN  RF
-                        ADCI 02h                  ; adjust page to old location       
-                        STR  RD                   ; set hi byte of himem          
-                        RETURN                    
-;------------------------------------------------------------------------------------------
-
-; =========================================================================================
 ; GetScratchPointer - Get a pointer to the scratch area in video buffers
 ;
 ; Note: Unsafe - This function does *not* save and restore registers used by video routines
@@ -1701,17 +1545,17 @@ GetScratchPointer:      LOAD R9, O_VIDEO
                         LDN  R9
                         ADI  02H        ; Video buffers 2 pages after display buffer start
                         PHI  RD
-                        LDI  0AH        ; Scratch area is immediately after Lo Himem flag 
+                        LDI  0AH        ; Scratch area is immediately after Mirror flag 
                         PLO  RD
                         RETURN
 ;------------------------------------------------------------------------------------------
                         
 ; =========================================================================================
-; SetStrRefValue - Set the string reference value in the sratch area
+; SetStrRefValue - Set the string reference value in the scratch area
 ;
 ; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ;
-; Note: Internal function used to save string reference for echo routines
+; Note: Internal function used to save string reference for mirror routines
 ;
 ; Parameters:
 ; RF            Original String reference
@@ -1733,7 +1577,7 @@ SetStrRefValue:         CALL GetScratchPointer
 ;
 ; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ;
-; Note: Internal function used to get original string reference for echo routines
+; Note: Internal function used to get original string reference for mirror routines
 ;
 ; Parameters:
 ; 
@@ -1754,7 +1598,7 @@ GetStrRefValue:         CALL GetScratchPointer
 ; SetCharValue - Save a character value in the scratch buffer area
 ;
 ; Note: Unsafe - This function does *not* save and restore registers used by video routines
-; Note: Internal function used to save the original character value for echo routines
+; Note: Internal function used to save the original character value for mirror routines
 ;
 ; Parameters:
 ; RC.0          Character to save
@@ -1773,7 +1617,7 @@ SetCharValue:           CALL GetScratchPointer
 ;
 ; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ;
-; Note: Internal function used to get original character value for echo routines
+; Note: Internal function used to get original character value for mirror routines
 ;
 ; Parameters:
 ; 
@@ -1790,7 +1634,7 @@ GetCharValue:           CALL GetScratchPointer
 ;------------------------------------------------------------------------------------------
 
 ; =========================================================================================
-; GetEchoPointer - Get a pointer to the Echo vectors in the video buffer
+; GetMirrorPointer - Get a pointer to the Mirror vectors in the video buffer
 ;
 ; Note: Unsafe - This function does *not* save and restore registers used by video routines
 ;
@@ -1800,216 +1644,15 @@ GetCharValue:           CALL GetScratchPointer
 ; R9            Pointer to video buffer page
 ;
 ; Returns:
-; RD            Pointer to Echo vector buffers
+; RD            Pointer to Mirror vector buffers
 ; =========================================================================================
-GetEchoPointer:         LOAD R9, O_VIDEO
+GetMirrorPointer:       LOAD R9, O_VIDEO
                         LDN  R9
                         ADI  02H        ; Video buffers 2 pages after display buffer start
                         PHI  RD
-                        LDI  0CH        ; Marker string is after Echo vectors 
+                        LDI  0CH        ; Mirror vector buffers are after Mirror Scratch area 
                         PLO  RD
                         RETURN
-;------------------------------------------------------------------------------------------
-
-; =========================================================================================
-; GetEchoFlagPointer - Get a pointer to the Echo vectors in the video buffer
-;
-; Note: Unsafe - This function does *not* save and restore registers used by video routines
-;
-; Parameters:
-;
-; Internal:
-; R9            Pointer to video buffer page
-;
-; Returns:
-; RD            Pointer to Echo vector buffers
-; =========================================================================================
-GetEchoFlagPointer:     LOAD R9, O_VIDEO
-                        LDN  R9
-                        ADI  02H        ; Video buffers 2 pages after display buffer start
-                        PHI  RD
-                        LDI  12H        ; Marker string is after Echo vectors 
-                        PLO  RD
-                        RETURN
-;------------------------------------------------------------------------------------------
-
-; =========================================================================================
-; SetEchoFlag - Set the echo flag to false or true
-;
-; Note: Unsafe - This function does *not* save and restore registers used by video routines
-; Note: Internal function to set or clear the echo flag
-;
-; Parameters:
-; RF.0          Value for flag, zero for false, non-zero for true
-; Internal:
-; RD            Pointer to video flag
-; =========================================================================================
-SetEchoFlag:            CALL GetEchoFlagPointer          
-                        GLO  RF                 ; get the value for the flag
-                        STR  RD                 ; store the flag
-                        
-                        RETURN
-;------------------------------------------------------------------------------------------
-
-; =========================================================================================
-; IsEchoOn - Get the Echo Flag from the video buffers
-;
-; Note: Safe - This function saves and restores registers used by video routines
-;
-; Parameters:
-;                
-; Internal:
-; R9            Pointer to video buffer page                        
-; RD            Pointer to Echo Flag location
-;
-; Returns: 
-; RF.0          Value of Echo flag (non-zero if true, zero if false)
-; =========================================================================================
-                        
-IsEchoOn:               PUSH R9
-                        PUSH RD
-                        CALL GetEchoFlagPointer   ; set pointer to video flag
-                        LDN  RD                   ; get video flag 
-                        PLO  RF
-                        POP  RD
-                        POP  R9                      
-                        RETURN                       
-;------------------------------------------------------------------------------------------
-
-;=========================================================================================
-; SaveVector - Save kernel vector into the video echo buffer location
-;
-; Note: Unsafe - This function does *not* save and restore registers used by video routines
-;
-; Parameters:
-;
-; Internal:
-; RD            Pointer Echo vector
-; RF            Pointer to kernel vector
-; Returns:
-; 
-; =========================================================================================
-SaveVector:             INC   RF            ; point to address
-                        LDA   RF            ; get hi address
-                        STR   RD            ; put into vector
-                        INC   RD            ; move to next address
-                        LDN   RF            ; get lo address
-                        STR   RD
-                        INC   RD      
-                        RETURN  
-;------------------------------------------------------------------------------------------
-  
-;=========================================================================================
-; RestoreVector - Save kernel vector into the video echo buffer location
-;
-; Note: Unsafe - This function does *not* save and restore registers used by video routines
-;
-; Parameters:
-;
-; Internal:
-; RD            Pointer Echo vector
-; RF            Pointer to kernel vector location
-; Returns:
-; 
-; =========================================================================================
-RestoreVector:          INC   RF            ; point to address
-                        LDA   RD            ; get original hi byte value from echo buffer
-                        STR   RF            ; save hi byte in kernel
-                        INC   RF            ; move to lo byte address
-                        LDA   RD            ; get original lo byte value from echo buffer
-                        STR   RF            ; save lo byte in kernel      
-                        RETURN  
-;------------------------------------------------------------------------------------------
-
-;=========================================================================================
-; MapVectors - Set kernel vectors to video echo routines
-;
-; Note: Unsafe - This function does *not* save and restore registers used by video routines
-;
-; Parameters:
-;
-; Internal:
-; RF            Pointer to kernel vector location
-; Returns:
-; 
-; =========================================================================================
-MapVectors:             LOAD RF, O_TYPE     ; point to kernel address
-                        INC  RF             ; point to address
-                        LDI  hi(EchoChar)
-                        STR  RF             ; save hi byte in kernel
-                        INC  RF             ; move to lo byte address
-                        LDI  lo(EchoChar)   ; get original lo byte value from echo buffer
-                        STR  RF             ; save lo byte in kernel
-                        LOAD RF, O_MSG      ; point to kenel address
-                        INC  RF             ; point to address
-                        LDI  hi(EchoMsg)
-                        STR  RF             ; save hi byte in kernel
-                        INC  RF             ; move to lo byte address
-                        LDI  lo(EchoMsg)    ; get original lo byte value from echo buffer
-                        STR  RF             ; save lo byte in kernel      
-                        LOAD RF, O_INMSG    ; point to kenel address
-                        INC  RF             ; point to address
-                        LDI  hi(EchoInMsg)
-                        STR  RF             ; save hi byte in kernel
-                        INC  RF             ; move to lo byte address
-                        LDI  lo(EchoInMsg)  ; get original lo byte value from echo buffer
-                        STR  RF             ; save lo byte in kernel      
-                        RETURN  
-;------------------------------------------------------------------------------------------
-                       
-;=========================================================================================
-; EchoOn - Save kernel vectors to echo vectors and map to video functions
-;
-; Note: Unsafe - This function does *not* save and restore registers used by video routines
-;
-; Parameters:
-;
-; Internal:
-; RD            Pointer to Echo vectors;
-; RF            Pointer to Kernel vector location
-; RF.0          Echo flag value
-; Returns:
-; 
-; =========================================================================================
-EchoOn:                 CALL GetEchoPointer   ; Point RD to Echo buffers
-                        LOAD RF, O_TYPE       ; Point RF to Kernel char fuction
-                        CALL SaveVector       ; Save Kernel vector
-                        LOAD RF, O_MSG        ; Point RF to Kernel msg function
-                        CALL SaveVector       ; Save Kernel vector 
-                        LOAD RF, O_INMSG      ; Point RF to Kernel inline msg function
-                        CALL SaveVector       ; Save Kernel vector
-                        LDI  0FFH 
-                        PLO  RF               ; Set Echo flag on
-                        CALL SetEchoFlag      
-                        CALL MapVectors       ; Map vectors to new location
-                        RETURN 
-;------------------------------------------------------------------------------------------
-
-;=========================================================================================
-; EchoOff - Restore kernel vectors from the echo vector locations in video buffer
-;
-; Note: Unsafe - This function does *not* save and restore registers used by video routines
-;
-; Parameters:
-;
-; Internal:
-; RD            Pointer to Echo vectors
-; RF            Pointer to Kernel vector
-; RF.0          Echo flag value
-; Returns:
-; 
-; =========================================================================================
-EchoOff:                CALL GetEchoPointer   ; Point RD to Echo buffers
-                        LOAD RF, O_TYPE       ; Point RF to Kernel char fuction
-                        CALL RestoreVector    ; Save Kernel vector
-                        LOAD RF, O_MSG        ; Point RF to Kernel msg function
-                        CALL RestoreVector    ; Save Kernel vector 
-                        LOAD RF, O_INMSG      ; Point RF to Kernel inline msg function
-                        CALL RestoreVector    ; Save Kernel vector
-                        LDI  00H              ; Set the Echo flag false
-                        PLO  RF
-                        CALL SetEchoFlag
-                        RETURN 
 ;------------------------------------------------------------------------------------------
 ; =========================================================================================
 ; Draw32x64Image - Copy a 32x64 bit image into the video buffer
@@ -2059,6 +1702,105 @@ D32_loop2:          LDA  RD             ; repeat line of 8 bytes
 ;------------------------------------------------------------------------------------------
 
 ; =========================================================================================
+; Draw64x64Image - Copy a 64x64 bit image into the video buffer
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
+; Parameters:
+; RF            Pointer to 512 byte image data
+;
+; Internal:
+; R9            Pointer to buffer page value
+; RA            Pointer to video buffer
+; =========================================================================================
+
+Draw64x64Image:            			LOAD R9, O_VIDEO   ; prepare the pointer to the video buffer
+                                LDN  R9
+                                PHI  RA
+                                LDI  00H
+                                PLO  RA
+
+D64_Loop1:                      LDA  RF							; Load first page of display	
+                                STR  RA
+                                INC  RA
+                                GLO  RA
+                                BNZ  D64_Loop1
+
+D64_Loop2:                      LDA  RF							; Load second page of display
+                                STR  RA
+                                INC  RA
+                                GLO  RA
+                                BNZ  D64_Loop2
+
+                                RETURN
+;------------------------------------------------------------------------------------------
+
+; =========================================================================================
+; GetMirrorFlagPointer - Get a pointer to the Mirror vectors in the video buffer
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
+; Parameters:
+;
+; Internal:
+; R9            Pointer to video buffer page
+;
+; Returns:
+; RD            Pointer to Mirror vector buffers
+; =========================================================================================
+GetMirrorFlagPointer:   LOAD R9, O_VIDEO
+                        LDN  R9
+                        ADI  02H        ; Video buffers 2 pages after display buffer start
+                        PHI  RD
+                        LDI  09H        ; Mirror Flag is after the new line flag 
+                        PLO  RD
+                        RETURN
+;------------------------------------------------------------------------------------------
+
+; =========================================================================================
+; SetMirrorFlag - Set the mirror flag to false or true
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+; Note: Internal function to set or clear the mirror flag
+;
+; Parameters:
+; RF.0          Value for flag, zero for false, non-zero for true
+; Internal:
+; RD            Pointer to video flag
+; =========================================================================================
+SetMirrorFlag:          CALL GetMirrorFlagPointer          
+                        GLO  RF                 ; get the value for the flag
+                        STR  RD                 ; store the flag
+                        
+                        RETURN
+;------------------------------------------------------------------------------------------
+
+; =========================================================================================
+; IsMirrorOn - Get the Mirror Flag from the video buffers
+;
+; Note: Safe - This function saves and restores registers used by video routines
+;
+; Parameters:
+;                
+; Internal:
+; R9            Pointer to video buffer page                        
+; RD            Pointer to Mirror Flag location
+;
+; Returns: 
+; RF.0          Value of Mirror flag (non-zero if true, zero if false)
+; =========================================================================================
+                        
+IsMirrorOn:             PUSH R9
+                        PUSH RD
+                        CALL GetMirrorFlagPointer   ; set pointer to video flag
+                        LDN  RD                   ; get video flag 
+                        PLO  RF                   ; put mirror flag in RF.0  
+                        POP  RD
+                        POP  R9                      
+                        RETURN                       
+;------------------------------------------------------------------------------------------
+
+; =========================================================================================
 ; IsVideoReady - Check that the video is loaded and started.
 ;
 ; Note: Safe - This function saves and restores registers used by video routines
@@ -2085,6 +1827,142 @@ IVR_loaded:           CALL GetVideoFlag     ; sets RF true if started, false if 
 IVR_done:             POP RD                ; restore registers used to get video flag
                       POP R9
                       RETURN
+;------------------------------------------------------------------------------------------
+
+;=========================================================================================
+; SaveVector - Save kernel vector into the video mirror buffer location
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
+; Parameters:
+;
+; Internal:
+; RD            Pointer Mirror vector
+; RF            Pointer to kernel vector
+; Returns:
+; 
+; =========================================================================================
+SaveVector:             INC   RF            ; point to address
+                        LDA   RF            ; get hi address
+                        STR   RD            ; put into vector
+                        INC   RD            ; move to next address
+                        LDN   RF            ; get lo address
+                        STR   RD
+                        INC   RD      
+                        RETURN  
+;------------------------------------------------------------------------------------------
+  
+;=========================================================================================
+; RestoreVector - Save kernel vector into the video mirror buffer location
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
+; Parameters:
+;
+; Internal:
+; RD            Pointer Mirror vector
+; RF            Pointer to kernel vector location
+; Returns:
+; 
+; =========================================================================================
+RestoreVector:          INC   RF            ; point to address
+                        LDA   RD            ; get original hi byte value from mirror buffer
+                        STR   RF            ; save hi byte in kernel
+                        INC   RF            ; move to lo byte address
+                        LDA   RD            ; get original lo byte value from mirror buffer
+                        STR   RF            ; save lo byte in kernel      
+                        RETURN  
+;------------------------------------------------------------------------------------------
+
+;=========================================================================================
+; MapVectors - Set kernel vectors to video mirror routines
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
+; Parameters:
+;
+; Internal:
+; RF            Pointer to kernel vector location
+; Returns:
+; 
+; =========================================================================================
+MapVectors:             LOAD RF, O_TYPE       ; point to kernel address
+                        INC  RF               ; point to address
+                        LDI  hi(MirrorChar)   ; get original hi byte from mirror buffer
+                        STR  RF               ; save hi byte in kernel
+                        INC  RF               ; move to lo byte address
+                        LDI  lo(MirrorChar)   ; get original lo byte from mirror buffer
+                        STR  RF               ; save lo byte in kernel
+                        LOAD RF, O_MSG        ; point to kernel address
+                        INC  RF               ; point to address
+                        LDI  hi(MirrorMsg)    ; get original hi byte from mirror buffer
+                        STR  RF               ; save hi byte in kernel
+                        INC  RF               ; move to lo byte address
+                        LDI  lo(MirrorMsg)    ; get original lo byte from mirror buffer
+                        STR  RF               ; save lo byte in kernel      
+                        LOAD RF, O_INMSG      ; point to kernel address
+                        INC  RF               ; point to address
+                        LDI  hi(MirrorInMsg)  ; get original hi byte from mirror buffer
+                        STR  RF               ; save hi byte in kernel
+                        INC  RF               ; move to lo byte address
+                        LDI  lo(MirrorInMsg)  ; get original lo byte from mirror buffer
+                        STR  RF               ; save lo byte in kernel      
+                        RETURN  
+;------------------------------------------------------------------------------------------
+                       
+;=========================================================================================
+; MirrorOn - Save kernel vectors to mirror vectors and map to video functions
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
+; Parameters:
+;
+; Internal:
+; RD            Pointer to Mirror vectors;
+; RF            Pointer to Kernel vector location
+; RF.0          Mirror flag value
+; Returns:
+; 
+; =========================================================================================
+MirrorOn:               CALL GetMirrorPointer ; Point RD to Mirror buffers
+                        LOAD RF, O_TYPE       ; Point RF to Kernel char fuction
+                        CALL SaveVector       ; Save Kernel vector
+                        LOAD RF, O_MSG        ; Point RF to Kernel msg function
+                        CALL SaveVector       ; Save Kernel vector 
+                        LOAD RF, O_INMSG      ; Point RF to Kernel inline msg function
+                        CALL SaveVector       ; Save Kernel vector
+                        LDI  0FFH 
+                        PLO  RF               ; Set Mirror flag on
+                        CALL SetMirrorFlag      
+                        CALL MapVectors       ; Map vectors to new location
+                        RETURN 
+;------------------------------------------------------------------------------------------
+
+;=========================================================================================
+; MirrorOff - Restore kernel vectors from the mirror vector locations in video buffer
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
+; Parameters:
+;
+; Internal:
+; RD            Pointer to Mirror vectors
+; RF            Pointer to Kernel vector
+; RF.0          Mirror flag value
+; Returns:
+; 
+; =========================================================================================
+MirrorOff:              CALL GetMirrorPointer ; Point RD to Mirror buffers
+                        LOAD RF, O_TYPE       ; Point RF to Kernel char fuction
+                        CALL RestoreVector    ; Save Kernel vector
+                        LOAD RF, O_MSG        ; Point RF to Kernel msg function
+                        CALL RestoreVector    ; Save Kernel vector 
+                        LOAD RF, O_INMSG      ; Point RF to Kernel inline msg function
+                        CALL RestoreVector    ; Save Kernel vector
+                        LDI  00H              ; Set the Mirror flag false
+                        PLO  RF
+                        CALL SetMirrorFlag
+                        RETURN 
 ;------------------------------------------------------------------------------------------
 
 ; =========================================================================================
@@ -2127,6 +2005,29 @@ DP_SetBit:              LDN  RF                 ; Get the current value in the b
                         STR  RF                 ; Store it back in the video buffer
                         RETURN
 ;------------------------------------------------------------------------------------------
+; =========================================================================================
+; ClearEndBufffer - Zero out stack area and padding bytes before and after 
+;
+; Note: Unsafe - This function does *not* save and restore registers used by video routines
+;
+; Parameters:
+;  
+; Internal:
+;  RD is used as a pointer into the video buffer
+; Returns:
+; 
+; =========================================================================================
+ClearStackArea:         CALL GetMarkerPointer     ; set RD to point to marker
+                        DEC  RD                   ; point RD to just before marker
+                        SEX  RD                   ; set X to data pointer
+CSA_clear:              LDI  00H                  ; zero out data bytes 
+                        STXD                      ; clear byte and back up
+                        GLO  RD                   ; check count for end
+                        SMI  11H                  ; check for one below padding byte
+                        BNZ  CSA_clear            ; keep going until all bytes cleared
+                        SEX  R2                   ; set x back to system stack  
+                        RETURN
+;------------------------------------------------------------------------------------------
 
 ; ******************************* VIDEO BUFFER MEMORY MAP *********************************
 
@@ -2145,19 +2046,21 @@ DP_SetBit:              LDN  RF                 ; Get the current value in the b
 ; =========================================================================================
 ; page+2:08 : 1 Byte NewLineFlag to indicate if CR or LF char should be skipped
 ; =========================================================================================
-; page+2:09 : 1 Byte original Lo HiMem byte
+; page+2:09 : 1 Byte MirrorFlag to indicate if mirror function is on or off
 ; =========================================================================================
-; page+2:0A,0B : 2 Byte scratch area for Echo routine string references and characters
+; page+2:0A,0B : 2 Byte scratch area for Mirror routine string references and characters
 ; =========================================================================================
-; page+2:0C,0D : Echo address vector for O_TYPE
-; page+2:0E,0F : Echo address vector for O_MSG
-; page+2:10,11 : Echo address vector for O_INMSG
+; page+2:0C,0D : Mirror address vector for O_TYPE
+; page+2:0E,0F : Mirror address vector for O_MSG
+; page+2:10,11 : Mirror address vector for O_INMSG
 ; =========================================================================================
-; page+2:12 : Echo Flag 
+; page+2:12 : 1 Byte padding before register stack 
 ; =========================================================================================
-; page+2:13-18 : 6 Bytes for "Pixie",0 string to verify video buffers are loaded
+; page+2:13-1E : Stack for Save/Restore Video Registers (R9, RA, RB, RC, RD and RF)  
 ; =========================================================================================
-; page+2:19-24 : Stack for Save/Restore Video Registers (R9, RA, RB, RC, RD and RF)  
+; page+2:1F : 1 Byte padding before marker 
+; =========================================================================================
+; page+2:20-25 : 6 Bytes for "Pixie",0 string to verify video buffers are loaded
 ; =========================================================================================
 
 

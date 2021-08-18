@@ -49,12 +49,12 @@ VideoCode EQU "ROM"
                     br  start                   ; Jump past build info to code
 
 ; Build information
-binfo:              db  80H+7            ; Month
-                    db  10               ; Day
+binfo:              db  80H+8            ; Month
+                    db  8                ; Day
                     dw  2021             ; Year
 
                     ; Current build number
-build:              dw  3
+build:              dw  4
 
                     ; Must end with 0 (null)
                     db  'Copyright 2021 Gaston Williams',0
