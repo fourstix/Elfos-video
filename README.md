@@ -268,7 +268,7 @@ Repository Contents
 * **/bin/stg_rom/**  -- Spare Time Gizmos v1.12 ROM with video routines.  
   * PicoElfSTG112Video.hex - Hex file for Spare Time Gizmos v1.12 and assembled video routines added at address 9D00H.
 * **/utils/pev2_rom/**  -- Utility files to create Pico/Elf v2 Runtime ROM with video routines. 
-  * runtime.hex - Hex file for Pico/Elf v2 Runtime.    
+  * runtime.hex - Hex file for Pico/Elf v2 Runtime from [rileym65/Elf-BIOS](https://github.com/rileym65/Elf-BIOS).    
 * **/utils/stg_rom/**  -- Utility files to create Spare Time Gizmos v1.12 ROM with video routines.  
   * help.new - Updated help text with Pixie Video test enabled.
   * Make_Stg.bat - Batch files to run the STG ROM tools to create the STG v1.12 ROM with video routines.
