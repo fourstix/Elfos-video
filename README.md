@@ -222,14 +222,14 @@ display a field of random dots.  DrawSine and DrawCircle are 32-bit programs usi
 Repository Contents
 -------------------
 * **/src/asm/video/**  -- Assembly code source files for the Elf/OS Video functions.
-  * VideoRom.asm	- Assembly file to locate the Elf/OS video functions in ROM.
-  * ops.inc - standard opcode definitions used in assembly source files
-  * bios.inc - Include file for Elf/OS bios definitions from [rileym65/Elf-BIOS](https://github.com/rileym65/Elf-BIOS)
-  * kernel.inc - Include file for Elf/OS kernel definitions from [rileym65/Elf-Elfos-Kernel](https://github.com/rileym65/Elf-Elfos-Kernel)  
-  * Graphics1861.asm - graphics routines for drawing on the CDP1861 display
-  * Text1861.asm - routines to draw text characters on screen
-  * Fonts.asm - font table for text functions
-  * Tty1861.asm	- printing routines and other video functions for the CDP1861 display
+  * **VideoRom.asm**	- Assembly file to locate the Elf/OS video functions in ROM.
+  * **ops.inc** - standard opcode definitions used in assembly source files
+  * **bios.inc** - Include file for Elf/OS bios definitions from [rileym65/Elf-BIOS](https://github.com/rileym65/Elf-BIOS)
+  * **kernel.inc** - Include file for Elf/OS kernel definitions from [rileym65/Elf-Elfos-Kernel](https://github.com/rileym65/Elf-Elfos-Kernel)  
+  * **Graphics1861.asm** - graphics routines for drawing on the CDP1861 display
+  * **Text1861.asm** - routines to draw text characters on screen
+  * **Fonts.asm** - font table for text functions
+  * **Tty1861.asm**	- printing routines and other video functions for the CDP1861 display
   These files are used to create the video.hex file used for the ROM images.
 * **/src/asm/**  -- Video programs for the Elf/OS
   * **VideoMem.asm** - Assembly file to locate the Elf/OS video functions in Memory.
@@ -303,7 +303,7 @@ Repository Contents
 * **/utils/bas/**  -- Basic/02 compiler  used to compile the demo programs.  Please check the [rileym65/Basic-02](https://github.com/rileym65/Basic-02) repository on GitHub for the latest version of Basic/02.
   * sbc.exe - Windows 10 executable version of the Basic/02 compiler.
   * sbc.doc - Basic/02 documentation.
-* **/utils/bas/**  -- Asm/02 assembler used to assemble the programs.  Please check the [rileym65/Asm-02](https://github.com/rileym65/Asm-02) repository on GitHub for the latest version of Asm/02.
+* **/utils/asm/**  -- Asm/02 assembler used to assemble the programs.  Please check the [rileym65/Asm-02](https://github.com/rileym65/Asm-02) repository on GitHub for the latest version of Asm/02.
     * asm02.exe - Windows 10 executable version of the Asm/02 assembler.
     * asm02.doc - Asm/02 documentation.  
 * **/pics/** -- Example pictures for the repository documentation 
