@@ -1,4 +1,5 @@
-clear# Elfos-video
+Elfos-video
+-----------
 Video functions for 1861 Pixie Video Display written for the 1802 Pico/Elf v2 microcomputer.
 
 This code provides support for a basic video functions on an 1861 Pixie Video display
@@ -7,7 +8,7 @@ It has been tested with the Pico/Elf v2 microcomputer by Mike Riley using the [P
 [Elf-Emulation.com](http://www.elf-emulation.com/).
 
 
-The code is based on Richard Dienstknecht's original graphics code that was posted in the [Cosmac Elf Group on Groups.io.](https://groups.io/g/cosmacelf) The code is assembled with the Windows version of the [Asm-02 1802 Assembler](https://github.com/fourstix/Asm-02) by Mike Riley.
+The code is based on Richard Dienstknecht's original graphics code that was posted in the [Cosmac Elf Group on Groups.io.](https://groups.io/g/cosmacelf) The code was assembled in Windows 10 using the [Asm-02 1802 Assembler](https://github.com/rileym65/Asm-02/) by Mike Riley.
  
 Examples
 --------
@@ -261,7 +262,7 @@ Repository Contents
   * **DrawStars.bas** - Basic/02 32-bit program that uses the Elfos-video API in ROM to draw a circle on the display.  Use the DrawCircle.bat batch file to compile the program.    
 * **/bin/video/**  -- Assembled binary code from the source files.
   * video.hex - Hex file assembled for video source.
-  * **/bin/video/mem/** -- Binary files assembled from the source files with the video routines located in memory.  These files can be loaded into the Elf/OS file system using the xr or xrb command.
+* **/bin/video/mem/** -- Binary files assembled from the source files with the video routines located in memory.  These files can be loaded into the Elf/OS file system using the xr or xrb command.
 * **/bin/video/rom/** -- Binary files assembled from the source files with the video routines located in ROM.  These files can be loaded into the Elf/OS file system using the xr or xrb command.
 * **/bin/bas/** -- Binary files compiled with the Basic/02 compiler for Elfos-video API routines located in ROM.
 * **/bin/pev2_rom/**  -- Pico/Elf v2 Runtime ROM with video routines.  
@@ -302,6 +303,9 @@ Repository Contents
 * **/utils/bas/**  -- Basic/02 compiler  used to compile the demo programs.  Please check the [rileym65/Basic-02](https://github.com/rileym65/Basic-02) repository on GitHub for the latest version of Basic/02.
   * sbc.exe - Windows 10 executable version of the Basic/02 compiler.
   * sbc.doc - Basic/02 documentation.
+* **/utils/bas/**  -- Asm/02 assembler used to assemble the programs.  Please check the [rileym65/Asm-02](https://github.com/rileym65/Asm-02) repository on GitHub for the latest version of Asm/02.
+    * asm02.exe - Windows 10 executable version of the Asm/02 assembler.
+    * asm02.doc - Asm/02 documentation.  
 * **/pics/** -- Example pictures for the repository documentation 
 
 STG v1.12 + Video ROM Memory Map
