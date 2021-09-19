@@ -3,38 +3,34 @@
 ;
 ; Copyright (c) 2021 by Gaston Williams
 ; *******************************************************************************************
-                        CPU 1802
-
-                        INCLUDE   bios.inc
-                        INCLUDE   kernel.inc
-
-                        INCLUDE   StdDefs.asm
-                        INCLUDE   "bitfuncs.inc"                    
+#include  ops.inc
+#include  bios.inc
+#include  kernel.inc
 
 ; ************************************************************
-; Define video code location as "ROM" or "MEM"
+; Define video code location in ROM or Memory
 ; ************************************************************                   
-VideoCode EQU "ROM"
+#include  location.inc
 
 ; ************************************************************
 ; Include the video definitions in the ROM
 ; ************************************************************                        
-                  IF VideoCode == "ROM"
-                    INCLUDE     video.inc                                          
-                  ENDIF                                                                                                                                 
+#if VideoCode == ROM
+#include  video.inc                                          
+#endif                                                      
 
-; =========================================================================================
+; ==============================================================================
 ; Reserved CPU registers
-; R0            Reserved as pointer to the DMA buffer
-; R1            Reserved as interrupt vector
+; R0            Pointer to the DMA buffer
+; R1            Interrupt vector
 ; R2            Main stack pointer
 ; R3            Main program counter
 ; R4            Program counter for standard call procedure
 ; R5            Program counter for standard return procedure
-; R6            Reserved for temporary values from standard call/return procedures
+; R6            Temporary values for standard call/return procedures
 ; RE.0          Used by Elf/OS to store accumulator in call procedures
 ; RE.1          Used by Elf/OS for baud rate
-; =========================================================================================
+; ==============================================================================
 
 ; ************************************************************
 ; This block generates the Execution header
@@ -49,12 +45,12 @@ VideoCode EQU "ROM"
                     br  start                   ; Jump past build info to code
 
 ; Build information
-binfo:              db  80H+8            ; Month
-                    db  8                ; Day
+binfo:              db  80H+9            ; Month
+                    db  17               ; Day
                     dw  2021             ; Year
 
                     ; Current build number
-build:              dw  4
+build:              dw  5
 
                     ; Must end with 0 (null)
                     db  'Copyright 2021 Gaston Williams',0
@@ -130,15 +126,15 @@ fildes:             db      0,0,0,0
             ;--- Message strings after video code
 usage:              db      'Usage: capture imagefile',13,10,0
 errmsg:             db      'File Error',10,13,0
-failed:             db      "Video is not loaded.",13,10,0
+failed:             db      'Video is not loaded.',13,10,0
 
 ; ************************************************************
 ; Assemble video routines in memory
 ; ************************************************************                        
-                  IF VideoCode == "MEM"
-                      ORG 02200H 
-                    INCLUDE "video/InitPicoElf.asm"
-                  ENDIF
+#if VideoCode == MEM
+  ORG 02200H 
+#include VideoMem.asm  
+#endif
 
             ;------ define end of execution block
 endrom:     equ     $

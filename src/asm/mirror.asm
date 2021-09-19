@@ -1,35 +1,32 @@
-; *******************************************************************************************
-; Mirror - Write strings from Elf/OS message functions to video display and serial output
+; *******************************************************************************
+; Mirror - Write strings from Elf/OS message functions to video display and to 
+;          serial output.  Toggles function on and off.
 ;
 ; Copyright (c) 2021 by Gaston Williams
 ;
-; *******************************************************************************************
-                      CPU 1802
-
-                      INCLUDE   bios.inc
-                      INCLUDE   kernel.inc
-
-                      INCLUDE   StdDefs.asm
-                      INCLUDE   "bitfuncs.inc"
+; ******************************************************************************
+#include  ops.inc
+#include  bios.inc
+#include  kernel.inc
 
 ; ************************************************************
 ; Mirror is only supported when the video code located is in ROM
 ; ************************************************************                   
-                    INCLUDE     video.inc                                          
+#include  video.inc                                       
                                                  
                       
-; =========================================================================================
+; ==============================================================================
 ; Starting point of the program and initialization of the CPU registers
-; R0            Reserved as pointer to the DMA buffer
-; R1            Reserved as interrupt vector
+; R0            Pointer to the DMA buffer
+; R1            Interrupt vector
 ; R2            Main stack pointer
 ; R3            Main program counter
 ; R4            Program counter for standard call procedure
 ; R5            Program counter for standard return procedure
-; R6            Reserved for temporary values from standard call/return procedures
+; R6            Temporary values for standard call/return procedures
 ; RE.0          Used by Elf/OS to store accumulator in call procedures
 ; RE.1          Used by Elf/OS for baud rate
-; =========================================================================================
+; ==============================================================================
 
 ; ************************************************************
 ; This block generates the Execution header
@@ -44,12 +41,12 @@
                     BR  start           ; Jump past build info to code
 
 ; Build information
-binfo:              db  80H+8           ; Month, 80H offset means extended info
-                    db  8               ; Day
+binfo:              db  80H+9           ; Month, 80H offset means extended info
+                    db  17               ; Day
                     dw  2021            ; Year
 
                     ; Current build number
-build:              dw  4
+build:              dw  5
 
                     ; Must end with 0 (null)
                     db  'Copyright 2021 Gaston Williams',0
@@ -78,9 +75,9 @@ turn_on:            CALL MirrorOn           ; turn mirror on
                     CALL O_MSG
                     LBR  O_WRMBOOT          ; return to Elf/OS
                     
-failed:             db "Video is not started.",10,13,0
-mirror_on:          db "Mirror is on.",10,13,0 
-mirror_off:         db "Mirror is off.",10,13,0                        
+failed:             db 'Video is not started.',10,13,0
+mirror_on:          db 'Mirror is on.',10,13,0 
+mirror_off:         db 'Mirror is off.',10,13,0                        
                       
 ;----------------------------------------------------------------------------------------
 ; define end of execution block

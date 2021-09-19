@@ -1,4 +1,5 @@
-clear# Elfos-video
+Elfos-video
+-----------
 Video functions for 1861 Pixie Video Display written for the 1802 Pico/Elf v2 microcomputer.
 
 This code provides support for a basic video functions on an 1861 Pixie Video display
@@ -7,7 +8,7 @@ It has been tested with the Pico/Elf v2 microcomputer by Mike Riley using the [P
 [Elf-Emulation.com](http://www.elf-emulation.com/).
 
 
-The code is based on Richard Dienstknecht's original graphics code that was posted in the [Cosmac Elf Group on Groups.io.](https://groups.io/g/cosmacelf) The code is assembled with the [Macro Assembler AS](http://john.ccac.rwth-aachen.de:8000/as/) by Alfred Arnold.
+The code is based on Richard Dienstknecht's original graphics code that was posted in the [Cosmac Elf Group on Groups.io.](https://groups.io/g/cosmacelf) The code was assembled in Windows 10 using the [Asm-02 1802 Assembler](https://github.com/rileym65/Asm-02/) by Mike Riley.
  
 Examples
 --------
@@ -220,19 +221,20 @@ display a field of random dots.  DrawSine and DrawCircle are 32-bit programs usi
 
 Repository Contents
 -------------------
-* **/src/video/**  -- Assembly code source files for the Elf/OS Video functions.
-  * StdDefs.asm - standard definitions and macros used in assembly source files
-  * InitPicoElf.asm - initialization functions and includes
-  * Graphics1861.asm - graphics routines for drawing on the CDP1861 display
-  * Text1861.asm - routines to draw text characters on screen
-  * Fonts.asm - font table for text functions
-  * Tty1861.asm	- printing routines and other video functions for the CDP1861 display
-  * VideoRom.asm	- Assembly file to locate the Elf/OS video functions in ROM.
-  * bios.inc - Include file for Elf/OS bios definitions from [rileym65/Elf-BIOS](https://github.com/rileym65/Elf-BIOS)
-  * kernel.inc - Include file for Elf/OS kernel definitions from [rileym65/Elf-Elfos-Kernel](https://github.com/rileym65/Elf-Elfos-Kernel)
+* **/src/asm/video/**  -- Assembly code source files for the Elf/OS Video functions.
+  * **VideoRom.asm**	- Assembly file to locate the Elf/OS video functions in ROM.
+  * **ops.inc** - standard opcode definitions used in assembly source files
+  * **bios.inc** - Include file for Elf/OS bios definitions from [rileym65/Elf-BIOS](https://github.com/rileym65/Elf-BIOS)
+  * **kernel.inc** - Include file for Elf/OS kernel definitions from [rileym65/Elf-Elfos-Kernel](https://github.com/rileym65/Elf-Elfos-Kernel)  
+  * **Graphics1861.asm** - graphics routines for drawing on the CDP1861 display
+  * **Text1861.asm** - routines to draw text characters on screen
+  * **Fonts.asm** - font table for text functions
+  * **Tty1861.asm**	- printing routines and other video functions for the CDP1861 display
   These files are used to create the video.hex file used for the ROM images.
 * **/src/asm/**  -- Video programs for the Elf/OS
+  * **VideoMem.asm** - Assembly file to locate the Elf/OS video functions in Memory.
   * **video.inc** - Include file for video ROM definitions.
+  * **location.inc** - Include file to define video functions in ROM or Memory.
   * **vstart.asm** - Start video by allocating video buffers in high memory and set flags. Use the vstart.bat batch file to assemble the vstart command
   * **vtest.asm** - Test video and show status. Use the vtest.bat batch file to assemble vtest command.
   * **vstop.asm** - Stop video, the -u option will also unload the video buffers and free up high memory.  Use the vstop.bat batch file to assemble the vstop command.
@@ -250,7 +252,7 @@ Repository Contents
   * **PixelDemo.asm** - Draw pixels on the display.  Use the PixelDemo.bat batch file to assemble PixelDemo.
   * **bios.inc** - Include file for Elf/OS bios definitions from [rileym65/Elf-BIOS](https://github.com/rileym65/Elf-BIOS)
   * **kernel.inc** - Include file for Elf/OS kernel definitions from [rileym65/Elf-Elfos-Kernel](https://github.com/rileym65/Elf-Elfos-Kernel)
-  * **StdDefs.asm** - standard definitions and macros used in assembly source files.  
+  * **ops.inc** - standard opcode definitions used in assembly source files.  
   * These files can be compiled to run with the video routines in ROM or in the command memory, except
   for mirror which works only with the video routines in ROM.  Setting the VideoCode constant to "ROM"
   in the code will use the addresses in video.inc to locate the routines, setting the VideoCode constant to MEM will locate the routines in the Elf/OS user memory.  The mirror command relies on the routines remaining available while the Elf/OS is running, so it requires the routines to be located in ROM.
@@ -260,7 +262,7 @@ Repository Contents
   * **DrawStars.bas** - Basic/02 32-bit program that uses the Elfos-video API in ROM to draw a circle on the display.  Use the DrawCircle.bat batch file to compile the program.    
 * **/bin/video/**  -- Assembled binary code from the source files.
   * video.hex - Hex file assembled for video source.
-  * **/bin/video/mem/** -- Binary files assembled from the source files with the video routines located in memory.  These files can be loaded into the Elf/OS file system using the xr or xrb command.
+* **/bin/video/mem/** -- Binary files assembled from the source files with the video routines located in memory.  These files can be loaded into the Elf/OS file system using the xr or xrb command.
 * **/bin/video/rom/** -- Binary files assembled from the source files with the video routines located in ROM.  These files can be loaded into the Elf/OS file system using the xr or xrb command.
 * **/bin/bas/** -- Binary files compiled with the Basic/02 compiler for Elfos-video API routines located in ROM.
 * **/bin/pev2_rom/**  -- Pico/Elf v2 Runtime ROM with video routines.  
@@ -301,6 +303,9 @@ Repository Contents
 * **/utils/bas/**  -- Basic/02 compiler  used to compile the demo programs.  Please check the [rileym65/Basic-02](https://github.com/rileym65/Basic-02) repository on GitHub for the latest version of Basic/02.
   * sbc.exe - Windows 10 executable version of the Basic/02 compiler.
   * sbc.doc - Basic/02 documentation.
+* **/utils/asm/**  -- Asm/02 assembler used to assemble the programs.  Please check the [rileym65/Asm-02](https://github.com/rileym65/Asm-02) repository on GitHub for the latest version of Asm/02.
+    * asm02.exe - Windows 10 executable version of the Asm/02 assembler.
+    * asm02.doc - Asm/02 documentation.  
 * **/pics/** -- Example pictures for the repository documentation 
 
 STG v1.12 + Video ROM Memory Map

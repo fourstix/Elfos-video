@@ -1,41 +1,37 @@
-; *******************************************************************************************
+; ******************************************************************************
 ; HappyDog - Draw a 512 byte image on the screen 
 ;
 ; Copyright (c) 2021 by Gaston Williams
 ; Based on a program written by Wayne Hortensius, 2021
-; *******************************************************************************************
-                        CPU 1802
+; ******************************************************************************
+#include  ops.inc
+#include  bios.inc
+#include  kernel.inc
 
-                        INCLUDE   bios.inc
-                        INCLUDE   kernel.inc
-
-                        INCLUDE   StdDefs.asm
-                        INCLUDE   "bitfuncs.inc"
-                        
 ; ************************************************************
-; Define video code location as "ROM" or "MEM"
+; Define video code location in ROM or Memory
 ; ************************************************************                   
-VideoCode EQU "ROM"
+#include  location.inc
 
 ; ************************************************************
 ; Include the video definitions in the ROM
 ; ************************************************************                        
-                  IF VideoCode == "ROM"
-                    INCLUDE     video.inc                                          
-                  ENDIF                                                                                 
+#if VideoCode == ROM
+#include  video.inc                                          
+#endif                                                      
 
-; =========================================================================================
+; ==============================================================================
 ; Reserved CPU registers
-; R0            Reserved as pointer to the DMA buffer
-; R1            Reserved as interrupt vector
+; R0            Pointer to the DMA buffer
+; R1            Interrupt vector
 ; R2            Main stack pointer
 ; R3            Main program counter
 ; R4            Program counter for standard call procedure
 ; R5            Program counter for standard return procedure
-; R6            Reserved for temporary values from standard call/return procedures
+; R6            Temporary values for standard call/return procedures
 ; RE.0          Used by Elf/OS to store accumulator in call procedures
 ; RE.1          Used by Elf/OS for baud rate
-; =========================================================================================
+; ==============================================================================
 
 ; ************************************************************
 ; This block generates the Execution header for a stand-alone
@@ -63,16 +59,16 @@ VideoCode EQU "ROM"
 ; build information, with build number and text.
 ; **************************************************
 
-binfo:				db	80h+8		; Month
-							db	8 			; Day
+binfo:				db	80h+9		; Month
+							db	17 			; Day
 							dw	2021		; Year
 
-build:				dw	4	      ; build
+build:				dw	5	      ; build
 							db	'Copyright 2021 Gaston Williams',0
 
-; =========================================================================================
+; ==============================================================================
 ; Main
-; =========================================================================================
+; ==============================================================================
 
 start:              CALL IsVideoReady
                     GLO  RF                 ; RF.0 non-zero if video started
@@ -87,18 +83,17 @@ loaded:             LOAD RF, doggie
                                       																	                                              
                     LBR O_WRMBOOT           ; return to Elf/OS
 
-;----------------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
    
-failed:   db "Video is not started.",13,10,0       
+failed:   db 'Video is not started.',13,10,0       
 
 ; ************************************************************
 ; Assemble video routines in memory
 ; ************************************************************                        
-                  IF VideoCode == "MEM"
-                      ORG 02200H 
-                    INCLUDE "video/InitPicoElf.asm"
-                  ENDIF
-
+#if VideoCode == MEM
+  ORG 02200H 
+#include VideoMem.asm  
+#endif
 
 ; ***************************************
 ; Data for 64x64 graphic image
@@ -171,4 +166,4 @@ doggie:
 
 
 ; define end of execution block
-endrom	equ	$		
+endrom:	equ	$		

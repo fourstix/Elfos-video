@@ -8,16 +8,16 @@
 
 
 ; Define address for standard BIOS vectors
-BIOS EQU 0ff00h
+BIOS: EQU 0ff00h
 
 
 ; Define address for extended BIOS vectors
-EBIOS EQU 0f800h
+EBIOS: EQU 0f800h
 
 
 
-; scall:      EQU  r4                    ; register for SCALL
-; sret:       EQU  r5                    ; register for SRET
+scall:      EQU  r4                    ; register for SCALL
+sret:       EQU  r5                    ; register for SRET
 
 f_boot:     EQU  (BIOS+00h)            ; boot from ide device
 f_type:     EQU  (BIOS+03h)            ; type 1 character to console
@@ -68,21 +68,21 @@ f_version:  EQU  (BIOS+0f9h)           ; 3 bytes holding bios version number
 
 ; "Extended" BIOS vectors
 
-f_bread     EQU  (EBIOS+00h)        ; read from onboard serial port
-f_btype     EQU  (EBIOS+03h)        ; write to onboard serial port
-f_btest     EQU  (EBIOS+06h)        ; test onboard serial port
-f_utype     EQU  (EBIOS+09h)        ; write to disk board UART
-f_uread     EQU  (EBIOS+0ch)        ; read from disk board UART
-f_utest     EQU  (EBIOS+0fh)        ; test disk board UART
-f_usetbd    EQU  (EBIOS+12h)        ; set disk board UART baud rate and format
-f_gettod    EQU  (EBIOS+15h)        ; read time of day clock
-f_settod    EQU  (EBIOS+18h)        ; set time of day clock
-f_rdnvr     EQU  (EBIOS+1bh)        ; read non volatile RAM
-f_wrnvr     EQU  (EBIOS+1eh)        ; write non volatile RAM
-f_idesize   EQU  (EBIOS+21h)        ; return size of attached IDE drive(s)
-f_ideid     EQU  (EBIOS+24h)        ; return device data for IDE drive(s)
-f_tmtoas    EQU  (EBIOS+2ah)        ; time to ASCII string
-f_dttoas    EQU  (EBIOS+27h)        ; date to ASCII string
-f_rtctest   EQU  (EBIOS+2dh)        ; test size and presence of RTC/NVR
-f_astodt    EQU  (EBIOS+30h)        ; convert ASCII string to date
-f_astotm    EQU  (EBIOS+33h)        ; convert ASCII string to time
+f_bread:     EQU  (EBIOS+00h)        ; read from onboard serial port
+f_btype:     EQU  (EBIOS+03h)        ; write to onboard serial port
+f_btest:     EQU  (EBIOS+06h)        ; test onboard serial port
+f_utype:     EQU  (EBIOS+09h)        ; write to disk board UART
+f_uread:     EQU  (EBIOS+0ch)        ; read from disk board UART
+f_utest:     EQU  (EBIOS+0fh)        ; test disk board UART
+f_usetbd:    EQU  (EBIOS+12h)        ; set disk board UART baud rate and format
+f_gettod:    EQU  (EBIOS+15h)        ; read time of day clock
+f_settod:    EQU  (EBIOS+18h)        ; set time of day clock
+f_rdnvr:     EQU  (EBIOS+1bh)        ; read non volatile RAM
+f_wrnvr:     EQU  (EBIOS+1eh)        ; write non volatile RAM
+f_idesize:   EQU  (EBIOS+21h)        ; return size of attached IDE drive(s)
+f_ideid:     EQU  (EBIOS+24h)        ; return device data for IDE drive(s)
+f_tmtoas:    EQU  (EBIOS+2ah)        ; time to ASCII string
+f_dttoas:    EQU  (EBIOS+27h)        ; date to ASCII string
+f_rtctest:   EQU  (EBIOS+2dh)        ; test size and presence of RTC/NVR
+f_astodt:    EQU  (EBIOS+30h)        ; convert ASCII string to date
+f_astotm:    EQU  (EBIOS+33h)        ; convert ASCII string to time

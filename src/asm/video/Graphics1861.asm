@@ -21,7 +21,7 @@ DisplayInt:                     NOP               ; 3 instruction cycles for NOP
                                 SAV               ; Save X,P on stack
                                 DEC  R2
                                 STR  R2           ; Save D on stack
-                                ; LDI  hi(DisplayBuffer)
+
                                 LOAD R0, O_VIDEO  ; 8 instruction cycles in MACRO
                                 LDA  R0                                
                                 PHI  R0
@@ -61,7 +61,6 @@ INT_Rest:                       GLO  R0
 FillScreen:                     LOAD R9, O_VIDEO   ; prepare the pointer to the video buffer
                                 LDN  R9
 
-; LDI  hi(DisplayBuffer)                  ; prepare the pointer to the video buffer
                                 PHI  RA
 
                                 LDI  00H
@@ -76,7 +75,6 @@ FS_Loop:                        GHI  RF
                                 LOAD R9, O_VIDEO   ; prepare the pointer to the video buffer
                                 LDN  R9
                                 ADI  01H           ; second video display buffer page at start + 1 
-                                ; LDI   hi(DisplayBuffer) + 1
 
                                 STR  R2
                                 GHI  RA
@@ -102,7 +100,6 @@ FS_Loop:                        GHI  RF
 
 DrawSprite:                     LOAD R9, O_VIDEO   ; prepare the pointer to the video buffer
                                 LDN  R9
-                                ; LDI  hi(DisplayBuffer)          ; prepare the pointer to the video buffer
 
                                 PHI  RC                 ; DisplayBuffer + Y * 8 + X / 8
                                 GHI  RA                 ; result goes to RC
@@ -138,7 +135,6 @@ DSP_ByteLoop:                   GLO  RD                 ; exit if all bytes of t
                                 LOAD R9, O_VIDEO        ; prepare the pointer to the video buffer
                                 LDN  R9
                                 ADI  01H                ; second video display buffer page at start + 1
-                                ; LDI   hi(DisplayBuffer) + 1
 
                                 STR  R2
                                 GHI  RC
@@ -178,6 +174,6 @@ DSP_ShiftExit:                  SEX  RC                 ; store the shifted byte
                                 ADCI 00H
                                 PHI  RC
                                 BR   DSP_ByteLoop
-DSP_Exit                        RETURN
+DSP_Exit:                       RETURN
 
 ;------------------------------------------------------------------------------------------

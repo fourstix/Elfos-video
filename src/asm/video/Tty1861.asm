@@ -30,12 +30,6 @@
 ; Gaston Williams, July, 2021 - Updated to use Elf/OS Alloc/Dealloc kernel routines
 ; *******************************************************************************************
 
-; **************************************************************
-; *** This block defines two special locations in the kernel ***
-; **************************************************************                    
-O_HIMEM:            EQU  0442H
-O_VIDEO:            EQU  03D0H  
-
 ; =========================================================================================
 ; HandleControlChar - Process a control character and move the cursor on screen
 ;
@@ -147,7 +141,7 @@ PutChar:                CALL CheckForNewLine    ; check for newline sequence
 
 WC_SetChar:             GLO  RC                 ; check for DEL or any character
                         SMI  7FH                ; that is greater than 7FH
-                        BGE   WC_Control
+                        BGE  WC_Control
 
                         GLO  RC                 ; get the character
                         SMI  20H                ; check for any printable character
@@ -1177,7 +1171,7 @@ AVB_okay:               LOAD RD, O_VIDEO      ; save video buffer page in kernel
 ;------------------------------------------------------------------------------------------
 
 ; =========================================================================================
-; UpdateVideo - Turn pixie video interrupts and DMA requests on, wait for an update 
+; UpdateVideo - Turn pixie video interrupts and DMA requests on, waits for an update 
 ;               and then turn them off.
 ;
 ; Note: Unsafe - This function does *not* save and restore registers used by video routines
@@ -1273,7 +1267,7 @@ CheckForNewLine:      CALL GetNewLineFlag
                       GLO  RC
                       SMI  0DH              ; check for <CR> after <LF>
                       BZ   CNL_Ignore
-CNL_CR                GLO  RC             
+CNL_CR:               GLO  RC             
                       SMI  0AH              ; check for <LF> after <CR>
                       BNZ  CNL_Done
 CNL_Ignore:           LDI  00H              ; replace ignored char by Null             
@@ -1888,24 +1882,24 @@ RestoreVector:          INC   RF            ; point to address
 ; =========================================================================================
 MapVectors:             LOAD RF, O_TYPE       ; point to kernel address
                         INC  RF               ; point to address
-                        LDI  hi(MirrorChar)   ; get original hi byte from mirror buffer
+                        LDI  MirrorChar.1     ; get original hi byte from mirror buffer
                         STR  RF               ; save hi byte in kernel
                         INC  RF               ; move to lo byte address
-                        LDI  lo(MirrorChar)   ; get original lo byte from mirror buffer
+                        LDI  MirrorChar.0     ; get original lo byte from mirror buffer
                         STR  RF               ; save lo byte in kernel
                         LOAD RF, O_MSG        ; point to kernel address
                         INC  RF               ; point to address
-                        LDI  hi(MirrorMsg)    ; get original hi byte from mirror buffer
+                        LDI  MirrorMsg.1      ; get original hi byte from mirror buffer
                         STR  RF               ; save hi byte in kernel
                         INC  RF               ; move to lo byte address
-                        LDI  lo(MirrorMsg)    ; get original lo byte from mirror buffer
+                        LDI  MirrorMsg.0      ; get original lo byte from mirror buffer
                         STR  RF               ; save lo byte in kernel      
                         LOAD RF, O_INMSG      ; point to kernel address
                         INC  RF               ; point to address
-                        LDI  hi(MirrorInMsg)  ; get original hi byte from mirror buffer
+                        LDI  MirrorInMsg.1    ; get original hi byte from mirror buffer
                         STR  RF               ; save hi byte in kernel
                         INC  RF               ; move to lo byte address
-                        LDI  lo(MirrorInMsg)  ; get original lo byte from mirror buffer
+                        LDI  MirrorInMsg.0    ; get original lo byte from mirror buffer
                         STR  RF               ; save lo byte in kernel      
                         RETURN  
 ;------------------------------------------------------------------------------------------
@@ -2064,4 +2058,4 @@ CSA_clear:              LDI  00H                  ; zero out data bytes
 ; =========================================================================================
 
 
-VideoMarker:            db "Pixie",0
+VideoMarker:            db 'Pixie',0
