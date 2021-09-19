@@ -1,5 +1,5 @@
 ; -------------------------------------------------------------------
-; Elf/OS video functions located in ROM
+; Elf/OS video functions located in Memory
 ; -------------------------------------------------------------------
 ; Based on software written by Michael H Riley
 ; Thanks to the author for making this code available.
@@ -20,13 +20,8 @@
 ;
 ; Changes:
 ; Gaston Williams, Feb,  2021 - Updated code for Pico/Elf
-; Gaston Williams, Sept, 2021 - refactored files for Asm/02 assembler
+; Gaston Williams, Sept, 2021 - Updated for Asm/02 assembler
 ; ******************************************************************************
-
-.list
-#include ops.inc
-#include bios.inc
-#include kernel.inc
 
 ********************************************************************************
 ; *** This defines the location in the kernel for video buffer page address. ***
@@ -46,14 +41,10 @@ O_VIDEO:            EQU  03D0H
 ; RE.1          Used by Elf/OS for baud rate
 ; ==============================================================================
 
-    ORG 09D00H 
 ; ==============================================================================
 ; Support 64 x 64 resolution, No double-buffering
 ; ==============================================================================
-#include Fonts.asm  
-#include Graphics1861.asm
-#include Text1861.asm                                                              
-#include Tty1861.asm
-
-;------ define end of execution block
-endrom: equ     $
+#include video/Fonts.asm  
+#include video/Graphics1861.asm
+#include video/Text1861.asm                                                              
+#include video/Tty1861.asm
