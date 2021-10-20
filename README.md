@@ -208,7 +208,8 @@ through the asm statement.  The Basic/02 compiler is available on GitHub in the
 
 These examples show how to call the Elfos-video routines from inside a Basic/02 program.
 DrawStars is an example of a 16-bit Basic/02 program using the Elfos-video routines to
-display a field of random dots.  DrawSine and DrawCircle are 32-bit programs using floating point functions to draw a sine wave and a circle on the video display using the Elfos-video drawpixel function.
+display a field of random dots.  DrawSine and DrawCircle are 32-bit programs using floating point functions to draw a sine wave and a circle on the video display using the Elfos-video drawpixel function.  The include file video_bas.inc contains modified ROM definitions that do not include the BASIC reserved words
+"Ready" or "Restore" in their names.
 
 **DrawStars** 
 * Basic/02 16-bit program to draw a random set of dots on the display.
@@ -218,6 +219,22 @@ display a field of random dots.  DrawSine and DrawCircle are 32-bit programs usi
 
 **DrawCircle**
 * Basic/02 32-bit program to draw a circle on the display.
+
+Library Files
+-------------
+The Elfos-video programs are available in two Elf/OS library files that can be unpacked with the Elf/OS lbr command using the e option to *extract* files.
+* video_mem.lbr - Library file for ELfos-video programs compiled with the video routines located in memory. Extract these files with the Elf/OS command *lbr e video_mem*
+* video_rom.lbr - Library file for ELfos-video programs compiled with the video routines located in ROM. Extract these files with the Elf/OS command *lbr e video_rom*
+
+Help Files
+-------------
+The video.lbr file provides help information for the Elfos-video utilities.  Although this file has the 
+same format as an Elf/OS library, do not use the lbr command to unpack it.  Instead copy this file,
+as is, into the /hlp directory with the other help libraries.  The *help* command will extract information from this file.
+
+The help information for an individual command can be displayed by typing *help video:name*, where name is the name of the utility command.  For example to show the help information for *vstop*, type in *help video:vstop*.
+
+The command *help video:* (note that it ends with a colon) will list all the Elfos-video programs with help information.
 
 Repository Contents
 -------------------
@@ -259,7 +276,8 @@ Repository Contents
 * **/src/bas/** -- Example programs for the Basic/02 compiler using Elfos-video API routines located in ROM.
   * **DrawStars.bas** - Basic/02 16-bit program that uses the Elfos-video API in ROM to draw random dots on the display. Use the DrawStars.bat batch file to compile the program.
   * **DrawSine.bas** - Basic/02 32-bit program that uses the Elfos-video API in ROM to draw a sine wave on the display. Use the DrawSine.bat batch file to compile the program.
-  * **DrawStars.bas** - Basic/02 32-bit program that uses the Elfos-video API in ROM to draw a circle on the display.  Use the DrawCircle.bat batch file to compile the program.    
+  * **DrawStars.bas** - Basic/02 32-bit program that uses the Elfos-video API in ROM to draw a circle on the display.  Use the DrawCircle.bat batch file to compile the program.
+  * **video_bas.inc** - Include file for video ROM definitions, modified to eliminate name conflicts with BASIC reserved words "Ready" and "Restore".   
 * **/bin/video/**  -- Assembled binary code from the source files.
   * video.hex - Hex file assembled for video source.
 * **/bin/video/mem/** -- Binary files assembled from the source files with the video routines located in memory.  These files can be loaded into the Elf/OS file system using the xr or xrb command.
@@ -306,6 +324,11 @@ Repository Contents
 * **/utils/asm/**  -- Asm/02 assembler used to assemble the programs.  Please check the [rileym65/Asm-02](https://github.com/rileym65/Asm-02) repository on GitHub for the latest version of Asm/02.
     * asm02.exe - Windows 10 executable version of the Asm/02 assembler.
     * asm02.doc - Asm/02 documentation.  
+* **/lbr/**  -- Library files for Elfos-video programs. (Unpack with Elf/OS lbr command)
+  * video_mem.lbr - Library file for ELfos-video programs compiled with the video routines located in memory.
+  * video_rom.lbr - Library file for ELfos-video programs compiled with the video routines located in ROM.
+* **/hlp/**  -- Help file for Elfos-video programs. (Used with Elf/OS help command)
+  * video.lbr - Help file for Elfos-video programs. (Do not unpack with lbr, instead copy into /hlp directory.)     
 * **/pics/** -- Example pictures for the repository documentation 
 
 STG v1.12 + Video ROM Memory Map

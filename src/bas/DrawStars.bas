@@ -1,24 +1,18 @@
-
+.list
 10  asm
-             ; define labels for video routines in ROM
-isready:     equ 0A478H
-saveregs:    equ 0A1D2H
-restoreregs: equ 0A203H
-println:     equ 0A199H
-update:      equ 0A283H   
-clear:       equ 0A0C9H
-drawpixel:   equ 0A520H  
-    end     
+             ; define labels for video routines in ROM                       
+#include video_bas.inc
+    end        
 20  R = 0
 30  PRINT "Checking video status."
 40  asm
-          ldi [R].1     ; point rd to R variable
+          ldi v_R.1     ; point rd to R variable
           phi rd
-          ldi [R].0
+          ldi v_R.0
           plo rd
-          sep  scall    ; check if video is ready  
-          dw   isready
-          glo  rf       ; RF.0 is non-zero if ready
+          sep  scall    ; check if video is okay  
+          dw   IsVideoOkay
+          glo  rf       ; RF.0 is non-zero if okay
           str  rd       ; set hi-byte of R with flag 
     end
 50  IF R = 0 THEN GOTO 900
@@ -26,12 +20,12 @@ drawpixel:   equ 0A520H
 60  PRINT "Clear the display."
 70  asm
           sep scall
-          dw  saveregs
+          dw  SaveVideoRegs
           sep scall
-          dw  clear
+          dw  ClearScreen
           sep scall
-          dw  restoreregs
-    end        
+          dw  GetVideoRegs
+    end       
     
 80  FOR I=1 to 100    
 90  X = RND(64)
@@ -39,25 +33,25 @@ drawpixel:   equ 0A520H
 110 asm
           ; draw random dot on display
           sep scall
-          dw  saveregs          
-          ldi [X].0       ; get X byte value
+          dw  SaveVideoRegs          
+          ldi v_X.0       ; get X byte value
           plo rf
-          ldi [X].1    
+          ldi v_X.1    
           phi rf          ; rf points to X 16-bit variable address
           inc rf
           ldn rf          ; point to Least Significant Byte
           plo ra          ; set X to byte value
-          ldi [Y].0       ; get Y byte value
+          ldi v_Y.0       ; get Y byte value
           plo rf
-          ldi [Y].1    
+          ldi v_Y.1    
           phi rf          ; rf points to Y 16-bit variable address
           inc rf          ; point to Least Significant Byte
           ldn rf       
           phi ra          ; set Y to byte value
           sep scall
-          dw  drawpixel   ; set pixel on display
+          dw  DrawPixel   ; set pixel on display
           sep scall
-          dw  restoreregs
+          dw  GetVideoRegs
     end
 120 GOSUB 500
 130 NEXT I
@@ -67,11 +61,11 @@ drawpixel:   equ 0A520H
 500 asm   
           ; subroutine to update display
           sep scall
-          dw  saveregs
+          dw  SaveVideoRegs
           sep scall
-          dw  update
+          dw  UpdateVideo
           sep scall
-          dw  restoreregs
+          dw  GetVideoRegs
           sep sret
     end
 
