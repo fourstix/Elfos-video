@@ -592,8 +592,12 @@ insertln:  ldi     0                   ; setup count
            ghi     rf
            stxd
 insertlp1: inc     rc                  ; increment count
-           lda     rf                  ; get next byte
-           smi     32                  ; loof for anything less than a space
+	   lda     rf                  ; get next byte
+	smi	   9		       ; allow tab
+	bz insertlp1
+	dec rf
+	lda rf
+	   smi     32                  ; loof for anything less than a space
            lbdf    insertlp1
            glo     rc                  ; get count
            stxd                        ; and save it

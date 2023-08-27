@@ -1353,6 +1353,11 @@ begin:     ldi     r0.1              ; Get address of register array
            sep     scall             ; draw screen
            dw      drawscn
 
+           
+          ; added for illegal instruction decode
+           lbr      instdn
+           db       0,'??? ',0
+           
 instdn:    ldi     multi.0           ; point to multi execution flags
            plo     r7
            ldn     r7                ; check for multi-execution
@@ -2454,7 +2459,8 @@ inst:      dw      doidl             ; 00 - IDL
            dw      doout5            ; 65 - OUT 5
            dw      doout6            ; 66 - OUT 6
            dw      doout7            ; 67 - OUT 7
-           dw      incp              ; 68 -
+;           dw      incp              ; 68 -
+           dw      instdn            ; 68 - ??? (illegal on 1802)
            dw      doinp1            ; 69 - INP 1
            dw      doinp2            ; 6A - INP 2
            dw      doinp3            ; 6B - INP 3
@@ -2646,4 +2652,3 @@ bp:        equ     nbp+1
 ntraps:    equ     bp+16
 traps:     equ     ntraps+1
 buffer:    equ     traps+16
-

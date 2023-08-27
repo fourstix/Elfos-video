@@ -381,7 +381,7 @@
 ;
 ; 115	-- Fix yet another XMODEM bug (thanks, David Madole!).
 ;--
-MONVER	.EQU	115
+MONVER	.EQU	118
 
 ; SUGGESTIONS FOR ENHANCEMENTS
 ; Add hardware flow control for loading HEX files over UART?
@@ -3785,4 +3785,3 @@ NCC1701:
 
 	.EJECT
 	.END
-

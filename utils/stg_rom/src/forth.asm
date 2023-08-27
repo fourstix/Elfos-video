@@ -248,7 +248,9 @@ memdone:   ldi     low himem           ; memory pointer
            inc     rf
            lbr     mainlp
 
-old:       ldi     low himem           ; memory pointer
+old:	   ldi	   high himem
+	   phi     r9
+	   ldi     low himem           ; memory pointer
            plo     r9                  ; place into r9
            lda     r9                  ; retreive high memory
            phi     rb

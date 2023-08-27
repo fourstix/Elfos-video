@@ -151,7 +151,7 @@ find_ln:   ldi     high pgmtext        ; point to beginning of basic storage
            ldi     low pgmtext
            plo     rc
 find_lp:   lda     rc                  ; get line size
-           bz      find_eof            ; jump if no more lines
+           lbz     find_eof            ; jump if no more lines
            inc     rc                  ; point to lsb
            sex     rc                  ; point data to line number
            glo     rd                  ; get requested line
@@ -164,8 +164,8 @@ find_lp:   lda     rc                  ; get line size
            str     r2                  ; place into memory
            glo     re                  ; get previous result
            or                          ; and or them together
-           bz      find_ex             ; found an exact match
-           bnf     find_eof            ; jump if line was high
+           lbz     find_ex             ; found an exact match
+           lbnf    find_eof            ; jump if line was high
            dec     rc                  ; point to line size
            sex     rc                  ; point to size
            glo     rc                  ; and add into line position
@@ -175,7 +175,7 @@ find_lp:   lda     rc                  ; get line size
            adci    0
            phi     rc
            sex     r2                  ; point X back to stack
-           br      find_lp             ; and keep searching
+           lbr     find_lp             ; and keep searching
 find_ex:   dec     rc                  ; point back to line size
            smi     0                   ; signal exact match
            br      group_7-1           ; and return
@@ -322,7 +322,7 @@ set_word:  lda     r3                  ; get msb of address
            lda     r3                  ; get value
            str     rf                  ; and store
            inc     rf
-           br      byte_go
+           lbr     byte_go
            
 set_rf:    lda     r3                  ; get msb
            phi     rf                  ; place into rf
@@ -2523,20 +2523,20 @@ mexpr_r:   ldi     2                   ; signal string result
 ; *****************************************************************
 strcmp:  lda     rd          ; get next byte in string
          xri     0ffh        ; check for end
-         bz      strcmpe     ; found end of first string
+         lbz     strcmpe     ; found end of first string
          xri     0ffh        ; restore character
          str     r2          ; store into memory
          lda     rf          ; get byte from first string
          sm                  ; subtract 2nd byte from it
-         bz      strcmp      ; so far a match, keep looking
-         bnf     strcmp1     ; jump if first string is smaller
+         lbz     strcmp      ; so far a match, keep looking
+         lbnf    strcmp1     ; jump if first string is smaller
          ldi     1           ; indicate first string is larger
          lskp                ; and return to caller
 strcmp1: ldi     255         ; return -1, first string is smaller
          sep     sret        ; return to calelr
 strcmpe: lda     rf          ; get byte from second string
          xri     0ffh        ; check for end of 2nd string
-         bz      strcmpm     ; jump if also zero
+         lbz     strcmpm     ; jump if also zero
          ldi     1           ; first string is smaller (returns -1)
          sep     sret        ; return to caller
 strcmpm: ldi     0           ; strings are a match
